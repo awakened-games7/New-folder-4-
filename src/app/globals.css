@@ -1,0 +1,292 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --background: #030712;
+  --foreground: #ffffff;
+  --font-orbitron: 'Orbitron', monospace;
+  --font-rajdhani: 'Rajdhani', sans-serif;
+  --font-jetbrains: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #030712;
+  color: #ffffff;
+  font-family: var(--font-rajdhani), sans-serif;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #030712;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #00f0ff, #0070f3);
+  border-radius: 4px;
+  box-shadow: 0 0 12px #00f0ff;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00f0ff;
+}
+
+/* AUTHENTIC SOLO LEVELING HOLOGRAPHIC SYSTEM WINDOW */
+.solo-window {
+  background: linear-gradient(180deg, rgba(8, 28, 60, 0.96) 0%, rgba(3, 14, 32, 0.98) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(0, 240, 255, 0.85);
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.4),
+              inset 0 0 30px rgba(0, 240, 255, 0.18),
+              0 25px 60px rgba(0, 0, 0, 0.98);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.solo-window:hover {
+  border-color: #00f0ff;
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.65),
+              inset 0 0 35px rgba(0, 240, 255, 0.25),
+              0 30px 70px rgba(0, 0, 0, 0.98);
+}
+
+/* DANGER / DUNGEON BREAK WINDOW (VIBRANT CRIMSON) */
+.solo-window-danger {
+  background: linear-gradient(180deg, rgba(68, 10, 24, 0.96) 0%, rgba(28, 3, 10, 0.98) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(255, 40, 90, 0.95);
+  box-shadow: 0 0 45px rgba(255, 40, 90, 0.55),
+              inset 0 0 30px rgba(255, 40, 90, 0.22),
+              0 25px 60px rgba(0, 0, 0, 0.98);
+  position: relative;
+}
+
+/* ORGANIC / VIOLET MONARCH WINDOW */
+.solo-window-purple {
+  background: linear-gradient(180deg, rgba(48, 14, 76, 0.96) 0%, rgba(20, 5, 36, 0.98) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(192, 132, 252, 0.9);
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.45),
+              inset 0 0 30px rgba(168, 85, 247, 0.2),
+              0 25px 60px rgba(0, 0, 0, 0.98);
+  position: relative;
+}
+
+/* INORGANIC / AMBER GOLD WINDOW */
+.solo-window-amber {
+  background: linear-gradient(180deg, rgba(54, 36, 8, 0.96) 0%, rgba(24, 16, 3, 0.98) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(251, 191, 36, 0.9);
+  box-shadow: 0 0 40px rgba(251, 191, 36, 0.45),
+              inset 0 0 30px rgba(251, 191, 36, 0.2),
+              0 25px 60px rgba(0, 0, 0, 0.98);
+  position: relative;
+}
+
+/* ALCHEMICAL EMERALD WINDOW */
+.solo-window-emerald {
+  background: linear-gradient(180deg, rgba(6, 44, 28, 0.96) 0%, rgba(2, 20, 12, 0.98) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(52, 211, 153, 0.9);
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.45),
+              inset 0 0 30px rgba(16, 185, 129, 0.2),
+              0 25px 60px rgba(0, 0, 0, 0.98);
+  position: relative;
+}
+
+/* CORNER BRACKET DECORATIONS */
+.solo-bracket {
+  position: relative;
+}
+
+.solo-bracket::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 16px;
+  height: 16px;
+  border-top: 3.5px solid #00f0ff;
+  border-left: 3.5px solid #00f0ff;
+  pointer-events: none;
+  z-index: 10;
+  filter: drop-shadow(0 0 8px #00f0ff);
+}
+
+.solo-bracket::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  border-bottom: 3.5px solid #00f0ff;
+  border-right: 3.5px solid #00f0ff;
+  pointer-events: none;
+  z-index: 10;
+  filter: drop-shadow(0 0 8px #00f0ff);
+}
+
+.solo-bracket-danger::before {
+  border-top-color: #ff285a !important;
+  border-left-color: #ff285a !important;
+  filter: drop-shadow(0 0 8px #ff285a) !important;
+}
+
+.solo-bracket-danger::after {
+  border-bottom-color: #ff285a !important;
+  border-right-color: #ff285a !important;
+  filter: drop-shadow(0 0 8px #ff285a) !important;
+}
+
+.solo-bracket-purple::before {
+  border-top-color: #c084fc !important;
+  border-left-color: #c084fc !important;
+  filter: drop-shadow(0 0 8px #c084fc) !important;
+}
+
+.solo-bracket-purple::after {
+  border-bottom-color: #c084fc !important;
+  border-right-color: #c084fc !important;
+  filter: drop-shadow(0 0 8px #c084fc) !important;
+}
+
+/* AUTHENTIC SYSTEM HEADER BAR */
+.solo-header-bar {
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.4) 0%, rgba(0, 100, 255, 0.25) 60%, transparent 100%);
+  border-bottom: 1.5px solid rgba(0, 240, 255, 0.6);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.solo-header-bar-danger {
+  background: linear-gradient(90deg, rgba(255, 40, 90, 0.45) 0%, rgba(180, 10, 40, 0.25) 60%, transparent 100%);
+  border-bottom: 1.5px solid rgba(255, 40, 90, 0.7);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.solo-header-bar-purple {
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.45) 0%, rgba(90, 20, 160, 0.25) 60%, transparent 100%);
+  border-bottom: 1.5px solid rgba(168, 85, 247, 0.7);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Glowing Neon Text Styles */
+.text-glow-blue {
+  color: #00f0ff;
+  text-shadow: 0 0 14px rgba(0, 240, 255, 0.95), 0 0 35px rgba(0, 240, 255, 0.7);
+}
+
+.text-glow-purple {
+  color: #c084fc;
+  text-shadow: 0 0 14px rgba(192, 132, 252, 0.95), 0 0 35px rgba(192, 132, 252, 0.7);
+}
+
+.text-glow-red {
+  color: #ff285a;
+  text-shadow: 0 0 14px rgba(255, 40, 90, 0.95), 0 0 35px rgba(255, 40, 90, 0.7);
+}
+
+.text-glow-gold {
+  color: #fbbf24;
+  text-shadow: 0 0 14px rgba(251, 191, 36, 0.95), 0 0 35px rgba(251, 191, 36, 0.7);
+}
+
+.text-glow-emerald {
+  color: #34d399;
+  text-shadow: 0 0 14px rgba(52, 211, 153, 0.95), 0 0 35px rgba(52, 211, 153, 0.7);
+}
+
+/* Hologram scanline grid overlay */
+.scanline-overlay {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 240, 255, 0.02) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.008),
+    rgba(0, 255, 0, 0.005),
+    rgba(0, 240, 255, 0.008)
+  );
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}
+
+/* Mana Progress Bar fills */
+.mana-bar-fill {
+  background: linear-gradient(90deg, #0052cc, #00f0ff, #70e2ff);
+  box-shadow: 0 0 22px #00f0ff;
+}
+
+.hp-bar-fill {
+  background: linear-gradient(90deg, #059669, #10b981, #34d399);
+  box-shadow: 0 0 22px #10b981;
+}
+
+.exp-bar-fill {
+  background: linear-gradient(90deg, #7c3aed, #a855f7, #c084fc);
+  box-shadow: 0 0 22px #a855f7;
+}
+
+.gold-bar-fill {
+  background: linear-gradient(90deg, #d97706, #fbbf24, #fde68a);
+  box-shadow: 0 0 22px #fbbf24;
+}
+
+/* Blue Eye & Shadow Flame aura */
+@keyframes blueFirePulse {
+  0% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.6), inset 0 0 20px rgba(0, 240, 255, 0.2); }
+  50% { box-shadow: 0 0 65px rgba(0, 240, 255, 0.95), inset 0 0 35px rgba(0, 240, 255, 0.4); }
+  100% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.6), inset 0 0 20px rgba(0, 240, 255, 0.2); }
+}
+
+.blue-fire-glow {
+  animation: blueFirePulse 3s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px #00f0ff); }
+  50% { transform: scale(1.04); filter: drop-shadow(0 0 25px #00f0ff); }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+@keyframes floatGentle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float {
+  animation: floatGentle 4s ease-in-out infinite;
+}
+
