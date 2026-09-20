@@ -405,11 +405,34 @@ export default function ChemistryArchives() {
     akc_8: true,
   });
 
-  const [expandedChapterId, setExpandedChapterId] = useState<string | null>("solutions");
+  const [expandedChapterIds, setExpandedChapterIds] = useState<Set<string>>(new Set(["solutions"]));
   const [categoryFilter, setCategoryFilter] = useState<"All" | "Physical" | "Inorganic" | "Organic">("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSubTab, setActiveSubTab] = useState<"syllabus" | "bosses" | "cheatsheet">("syllabus");
   const [copiedFormula, setCopiedFormula] = useState<string | null>(null);
+
+  const toggleExpandChapter = (id: string) => {
+    sounds.playClick();
+    setExpandedChapterIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const expandAllChapters = () => {
+    sounds.playClick();
+    setExpandedChapterIds(new Set(CBSE_CHEMISTRY_CHAPTERS.map((c) => c.id)));
+  };
+
+  const collapseAllChapters = () => {
+    sounds.playClick();
+    setExpandedChapterIds(new Set());
+  };
 
   const toggleTopic = (topicId: string) => {
     sounds.playClick();
@@ -685,10 +708,10 @@ export default function ChemistryArchives() {
               </div>
             </div>
 
-            {/* Filter Bar & Search Box */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+            {/* Filter Bar & Search Box & Expand All / Collapse All */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-2">
               {/* Category Filter Pills */}
-              <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+              <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
                 {[
                   { label: "All Chapters (10)", val: "All", color: "bg-cyan-500 text-black" },
                   { label: "Physical (23 Marks)", val: "Physical", color: "bg-cyan-600 text-white" },
@@ -701,7 +724,7 @@ export default function ChemistryArchives() {
                       sounds.playClick();
                       setCategoryFilter(filter.val as "All" | "Physical" | "Inorganic" | "Organic");
                     }}
-                    className={`px-3.5 py-1.5 rounded-sm font-orbitron text-xs font-bold transition-all uppercase whitespace-nowrap ${
+                    className={`px-3 py-1.5 rounded-sm font-orbitron text-xs font-bold transition-all uppercase whitespace-nowrap ${
                       categoryFilter === filter.val
                         ? `${filter.color} shadow-neon-blue font-black`
                         : "bg-black/70 text-slate-300 hover:text-cyan-200 border border-slate-700"
@@ -712,23 +735,42 @@ export default function ChemistryArchives() {
                 ))}
               </div>
 
-              {/* Search Input */}
-              <div className="relative w-full sm:w-72">
-                <Search className="w-4 h-4 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search topic, reaction, formula..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-black/80 border border-cyan-500/40 rounded px-3 pl-9 py-2 text-xs text-cyan-200 focus:outline-none focus:border-cyan-400 font-rajdhani"
-                />
+              {/* Expand All / Collapse All & Search Input */}
+              <div className="flex items-center gap-2 w-full md:w-auto">
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={expandAllChapters}
+                    className="px-2.5 py-1.5 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-400 text-cyan-200 font-orbitron text-[10px] font-bold rounded uppercase whitespace-nowrap"
+                    title="Expand all 10 chapters simultaneously"
+                  >
+                    EXPAND ALL
+                  </button>
+                  <button
+                    onClick={collapseAllChapters}
+                    className="px-2.5 py-1.5 bg-black/80 hover:bg-slate-900 border border-slate-700 text-slate-300 font-orbitron text-[10px] font-bold rounded uppercase whitespace-nowrap"
+                    title="Collapse all chapters"
+                  >
+                    COLLAPSE ALL
+                  </button>
+                </div>
+
+                <div className="relative w-full sm:w-64">
+                  <Search className="w-4 h-4 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search topic, formula..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-black/80 border border-cyan-500/40 rounded px-3 pl-9 py-1.5 text-xs text-cyan-200 focus:outline-none focus:border-cyan-400 font-rajdhani"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Chapter Accordion List */}
             <div className="space-y-4">
               {filteredChapters.map((chapter) => {
-                const isExpanded = expandedChapterId === chapter.id;
+                const isExpanded = expandedChapterIds.has(chapter.id);
                 const chapterCompletedCount = chapter.topics.filter((t) => completedTopics[t.id]).length;
                 const chapterTotalCount = chapter.topics.length;
                 const chapterProgress = Math.round((chapterCompletedCount / chapterTotalCount) * 100);
@@ -747,10 +789,7 @@ export default function ChemistryArchives() {
                   >
                     {/* Accordion Header */}
                     <div
-                      onClick={() => {
-                        sounds.playClick();
-                        setExpandedChapterId(isExpanded ? null : chapter.id);
-                      }}
+                      onClick={() => toggleExpandChapter(chapter.id)}
                       className="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none transition-colors"
                     >
                       <div className="flex items-center gap-3 sm:gap-4 flex-1">
