@@ -677,9 +677,8 @@ const Beaker3D: React.FC<Beaker3DProps> = ({
             {/* 3D PTFE Magnetic Stir Bar */}
             <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-15">
               <div
-                className={`w-8 h-2.5 rounded-full bg-white border border-slate-300 shadow-[0_2px_4px_rgba(0,0,0,0.6)] ${
-                  stirrerRPM > 0 ? "animate-stirbar-3d" : ""
-                }`}
+                className={`w-8 h-2.5 rounded-full bg-white border border-slate-300 shadow-[0_2px_4px_rgba(0,0,0,0.6)] ${stirrerRPM > 0 ? "animate-stirbar-3d" : ""
+                  }`}
               />
             </div>
           </div>
@@ -899,10 +898,19 @@ export default function VirtualAlchemyLab() {
     }
   };
 
+  // Auto-scroll handler for anchor hash deep-links (#alchemy-lab or #arena-raid-view)
   useEffect(() => {
-    return () => {
-      if (titrationIntervalRef.current) clearInterval(titrationIntervalRef.current);
-    };
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash;
+      if (hash === "#alchemy-lab" || hash === "#arena-raid-view") {
+        setTimeout(() => {
+          const el = document.getElementById("alchemy-lab") || document.getElementById("arena-raid-view");
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }, 300); // 300ms delay ensures React finishes mounting before scrolling
+      }
+    }
   }, []);
 
   const handleResetTitration = () => {
@@ -923,7 +931,7 @@ export default function VirtualAlchemyLab() {
   const calculatedPh = activeReaction ? activeReaction.phResult : activeReagents.length > 0 ? 7.0 : 7.0;
 
   return (
-    <section id="arena-raid-view" className="relative w-full py-6 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="alchemy-lab" className="relative w-full py-6 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* ── HEADER TITLE & BADGE ── */}
       <div className="relative mb-5 text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono tracking-widest uppercase mb-1.5 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
@@ -956,11 +964,10 @@ export default function VirtualAlchemyLab() {
                 sounds.playClick();
                 setActiveMode(tab.id as LabMode);
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-xs uppercase tracking-wider whitespace-nowrap transition-all border shrink-0 ${
-                isActive
-                  ? `bg-slate-900 ${tab.border} ${tab.color} shadow-[0_0_12px_rgba(0,255,221,0.25)] font-bold`
-                  : "bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700"
-              }`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-xs uppercase tracking-wider whitespace-nowrap transition-all border shrink-0 ${isActive
+                ? `bg-slate-900 ${tab.border} ${tab.color} shadow-[0_0_12px_rgba(0,255,221,0.25)] font-bold`
+                : "bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700"
+                }`}
             >
               <Icon className="w-3.5 h-3.5" />
               <span>{tab.label}</span>
@@ -1032,11 +1039,10 @@ export default function VirtualAlchemyLab() {
                 {/* Heater Toggle */}
                 <button
                   onClick={handleBunsenToggle}
-                  className={`flex-1 py-1.5 px-2 rounded-lg border flex items-center justify-center gap-1 transition-all ${
-                    bunsenHeatLevel > 0
-                      ? "border-red-500 bg-red-950/50 text-red-300 font-bold shadow-[0_0_12px_rgba(239,68,68,0.3)]"
-                      : "border-slate-800 bg-slate-900/80 text-slate-400 hover:text-white"
-                  }`}
+                  className={`flex-1 py-1.5 px-2 rounded-lg border flex items-center justify-center gap-1 transition-all ${bunsenHeatLevel > 0
+                    ? "border-red-500 bg-red-950/50 text-red-300 font-bold shadow-[0_0_12px_rgba(239,68,68,0.3)]"
+                    : "border-slate-800 bg-slate-900/80 text-slate-400 hover:text-white"
+                    }`}
                 >
                   <Flame className={`w-3.5 h-3.5 ${bunsenHeatLevel > 0 ? "text-red-400 animate-flame" : ""}`} />
                   <span>{bunsenHeatLevel === 0 ? "FLAME: OFF" : `HEAT: L${bunsenHeatLevel}`}</span>
@@ -1045,11 +1051,10 @@ export default function VirtualAlchemyLab() {
                 {/* Stirrer Toggle */}
                 <button
                   onClick={handleStirrerToggle}
-                  className={`flex-1 py-1.5 px-2 rounded-lg border flex items-center justify-center gap-1 transition-all ${
-                    stirrerRPM > 0
-                      ? "border-cyan-500 bg-cyan-950/50 text-cyan-300 font-bold shadow-[0_0_12px_rgba(6,182,212,0.3)]"
-                      : "border-slate-800 bg-slate-900/80 text-slate-400 hover:text-white"
-                  }`}
+                  className={`flex-1 py-1.5 px-2 rounded-lg border flex items-center justify-center gap-1 transition-all ${stirrerRPM > 0
+                    ? "border-cyan-500 bg-cyan-950/50 text-cyan-300 font-bold shadow-[0_0_12px_rgba(6,182,212,0.3)]"
+                    : "border-slate-800 bg-slate-900/80 text-slate-400 hover:text-white"
+                    }`}
                 >
                   <RotateCcw className={`w-3.5 h-3.5 ${stirrerRPM > 0 ? "text-cyan-400 animate-spin" : ""}`} />
                   <span>{stirrerRPM === 0 ? "STIR: OFF" : `${stirrerRPM} RPM`}</span>
@@ -1133,9 +1138,8 @@ export default function VirtualAlchemyLab() {
                         sounds.playClick();
                         setDoseAmount(vol);
                       }}
-                      className={`px-2 py-0.5 text-[10px] rounded ${
-                        doseAmount === vol ? "bg-emerald-500 text-black font-bold" : "text-slate-400 hover:text-white"
-                      }`}
+                      className={`px-2 py-0.5 text-[10px] rounded ${doseAmount === vol ? "bg-emerald-500 text-black font-bold" : "text-slate-400 hover:text-white"
+                        }`}
                     >
                       +{vol}mL
                     </button>
@@ -1158,11 +1162,10 @@ export default function VirtualAlchemyLab() {
                       sounds.playClick();
                       setActiveCategoryFilter(cat.id as ReagentCategory);
                     }}
-                    className={`px-2.5 py-1 rounded-md border uppercase whitespace-nowrap transition-all ${
-                      activeCategoryFilter === cat.id
-                        ? "bg-emerald-950 border-emerald-400 text-emerald-300 font-bold"
-                        : "bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700"
-                    }`}
+                    className={`px-2.5 py-1 rounded-md border uppercase whitespace-nowrap transition-all ${activeCategoryFilter === cat.id
+                      ? "bg-emerald-950 border-emerald-400 text-emerald-300 font-bold"
+                      : "bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700"
+                      }`}
                   >
                     {cat.label}
                   </button>
@@ -1177,11 +1180,10 @@ export default function VirtualAlchemyLab() {
                     <button
                       key={reagent.id}
                       onClick={() => handleAddReagent(reagent)}
-                      className={`p-2 rounded-lg border text-left transition-all duration-150 flex flex-col justify-between h-[76px] sm:h-[82px] relative overflow-hidden group ${
-                        isPresent
-                          ? "border-emerald-400 bg-emerald-950/40 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
-                          : `border-slate-800 bg-gradient-to-br ${reagent.bgGradient} hover:border-slate-600`
-                      }`}
+                      className={`p-2 rounded-lg border text-left transition-all duration-150 flex flex-col justify-between h-[76px] sm:h-[82px] relative overflow-hidden group ${isPresent
+                        ? "border-emerald-400 bg-emerald-950/40 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+                        : `border-slate-800 bg-gradient-to-br ${reagent.bgGradient} hover:border-slate-600`
+                        }`}
                     >
                       <div className="flex items-center justify-between w-full">
                         <span className="text-[9px] text-slate-400 uppercase">{reagent.category}</span>
@@ -1228,11 +1230,10 @@ export default function VirtualAlchemyLab() {
                       sounds.playClick();
                       setSelectedFlameElement(elem);
                     }}
-                    className={`p-2.5 rounded-lg border text-left font-mono transition-all flex items-center justify-between ${
-                      selectedFlameElement.id === elem.id
-                        ? "border-amber-400 bg-amber-950/40 text-amber-300 font-bold shadow-[0_0_12px_rgba(245,158,11,0.2)]"
-                        : "border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700"
-                    }`}
+                    className={`p-2.5 rounded-lg border text-left font-mono transition-all flex items-center justify-between ${selectedFlameElement.id === elem.id
+                      ? "border-amber-400 bg-amber-950/40 text-amber-300 font-bold shadow-[0_0_12px_rgba(245,158,11,0.2)]"
+                      : "border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700"
+                      }`}
                   >
                     <div>
                       <div className="text-xs text-white">{elem.element} [{elem.symbol}]</div>
@@ -1258,11 +1259,10 @@ export default function VirtualAlchemyLab() {
                     sounds.playClick();
                     setUseCobaltGlass(!useCobaltGlass);
                   }}
-                  className={`px-3 py-1.5 rounded-lg border text-xs font-mono transition-all flex items-center gap-2 ${
-                    useCobaltGlass
-                      ? "bg-blue-900 border-blue-400 text-white font-bold shadow-[0_0_15px_rgba(59,130,246,0.5)]"
-                      : "bg-slate-900 border-slate-700 text-slate-400 hover:text-white"
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-mono transition-all flex items-center gap-2 ${useCobaltGlass
+                    ? "bg-blue-900 border-blue-400 text-white font-bold shadow-[0_0_15px_rgba(59,130,246,0.5)]"
+                    : "bg-slate-900 border-slate-700 text-slate-400 hover:text-white"
+                    }`}
                 >
                   <Eye className="w-3.5 h-3.5" />
                   <span>COBALT BLUE GLASS: {useCobaltGlass ? "ON" : "OFF"}</span>
@@ -1282,9 +1282,8 @@ export default function VirtualAlchemyLab() {
               <div className="relative flex flex-col items-center z-20">
                 {/* Platinum Wire Loop with sample */}
                 <div
-                  className={`w-1 h-32 bg-gradient-to-b from-slate-400 via-slate-200 to-slate-400 rounded transition-transform duration-500 ease-out flex flex-col items-center justify-end z-25 shadow-md ${
-                    isWireInFlame ? "translate-y-8" : "-translate-y-6"
-                  }`}
+                  className={`w-1 h-32 bg-gradient-to-b from-slate-400 via-slate-200 to-slate-400 rounded transition-transform duration-500 ease-out flex flex-col items-center justify-end z-25 shadow-md ${isWireInFlame ? "translate-y-8" : "-translate-y-6"
+                    }`}
                 >
                   <div
                     className="w-4 h-4 rounded-full border-2 border-slate-300 shadow-sm"
@@ -1321,11 +1320,10 @@ export default function VirtualAlchemyLab() {
                     sounds.playFlame();
                     setIsWireInFlame(!isWireInFlame);
                   }}
-                  className={`px-5 py-2.5 rounded-lg border font-mono text-xs uppercase tracking-wider font-bold transition-all ${
-                    isWireInFlame
-                      ? "bg-amber-500 text-black border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)]"
-                      : "bg-slate-900 text-amber-400 border-amber-500/50 hover:bg-slate-800"
-                  }`}
+                  className={`px-5 py-2.5 rounded-lg border font-mono text-xs uppercase tracking-wider font-bold transition-all ${isWireInFlame
+                    ? "bg-amber-500 text-black border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)]"
+                    : "bg-slate-900 text-amber-400 border-amber-500/50 hover:bg-slate-800"
+                    }`}
                 >
                   {isWireInFlame ? "RETRACT PLATINUM WIRE" : "DIP WIRE INTO FLAME"}
                 </button>
@@ -1375,11 +1373,10 @@ export default function VirtualAlchemyLab() {
                       sounds.playClick();
                       setTitrantIndicator("phenolphthalein");
                     }}
-                    className={`p-2 rounded border text-xs text-left ${
-                      titrantIndicator === "phenolphthalein"
-                        ? "border-pink-500 bg-pink-950/40 text-pink-300 font-bold"
-                        : "border-slate-800 bg-slate-900 text-slate-400"
-                    }`}
+                    className={`p-2 rounded border text-xs text-left ${titrantIndicator === "phenolphthalein"
+                      ? "border-pink-500 bg-pink-950/40 text-pink-300 font-bold"
+                      : "border-slate-800 bg-slate-900 text-slate-400"
+                      }`}
                   >
                     Phenolphthalein
                     <div className="text-[9px] text-slate-400">Endpoint: Pink (pH 8.2)</div>
@@ -1389,11 +1386,10 @@ export default function VirtualAlchemyLab() {
                       sounds.playClick();
                       setTitrantIndicator("methyl_orange");
                     }}
-                    className={`p-2 rounded border text-xs text-left ${
-                      titrantIndicator === "methyl_orange"
-                        ? "border-amber-500 bg-amber-950/40 text-amber-300 font-bold"
-                        : "border-slate-800 bg-slate-900 text-slate-400"
-                    }`}
+                    className={`p-2 rounded border text-xs text-left ${titrantIndicator === "methyl_orange"
+                      ? "border-amber-500 bg-amber-950/40 text-amber-300 font-bold"
+                      : "border-slate-800 bg-slate-900 text-slate-400"
+                      }`}
                   >
                     Methyl Orange
                     <div className="text-[9px] text-slate-400">Endpoint: Yellow (pH 4.4)</div>
@@ -1405,11 +1401,10 @@ export default function VirtualAlchemyLab() {
               <div className="grid grid-cols-2 gap-2 pt-2">
                 <button
                   onClick={handleToggleTitrationFlow}
-                  className={`p-2.5 rounded font-bold text-xs uppercase transition-all ${
-                    isTitratingFlow
-                      ? "bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]"
-                      : "bg-cyan-500 text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                  }`}
+                  className={`p-2.5 rounded font-bold text-xs uppercase transition-all ${isTitratingFlow
+                    ? "bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+                    : "bg-cyan-500 text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                    }`}
                 >
                   {isTitratingFlow ? "STOP STOPCOCK" : "START DROPWISE"}
                 </button>
@@ -1504,8 +1499,8 @@ export default function VirtualAlchemyLab() {
                         ? "#ec4899"
                         : "rgba(224, 242, 254, 0.45)"
                       : titrationPh < 3.5
-                      ? "#ef4444"
-                      : "#eab308",
+                        ? "#ef4444"
+                        : "#eab308",
                   opacity: 0.9,
                 }}
               >
@@ -1631,11 +1626,10 @@ export default function VirtualAlchemyLab() {
 
               {detectiveResult && (
                 <div
-                  className={`p-3 rounded-lg border text-xs font-bold ${
-                    detectiveResult.startsWith("CORRECT")
-                      ? "bg-emerald-950/60 border-emerald-500 text-emerald-300"
-                      : "bg-red-950/60 border-red-500 text-red-300"
-                  }`}
+                  className={`p-3 rounded-lg border text-xs font-bold ${detectiveResult.startsWith("CORRECT")
+                    ? "bg-emerald-950/60 border-emerald-500 text-emerald-300"
+                    : "bg-red-950/60 border-red-500 text-red-300"
+                    }`}
                 >
                   {detectiveResult}
                 </div>
@@ -1680,11 +1674,10 @@ export default function VirtualAlchemyLab() {
                       sounds.playClick();
                       setInspectedElement(elem);
                     }}
-                    className={`p-2.5 rounded-lg border text-center transition-all flex flex-col items-center justify-between h-20 ${
-                      isSelected
-                        ? "border-rose-400 bg-rose-950/50 shadow-[0_0_15px_rgba(244,63,94,0.3)] text-rose-300 font-bold"
-                        : "border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700"
-                    }`}
+                    className={`p-2.5 rounded-lg border text-center transition-all flex flex-col items-center justify-between h-20 ${isSelected
+                      ? "border-rose-400 bg-rose-950/50 shadow-[0_0_15px_rgba(244,63,94,0.3)] text-rose-300 font-bold"
+                      : "border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700"
+                      }`}
                   >
                     <span className="text-[9px] text-slate-500 self-start">{elem.number}</span>
                     <span className="text-lg font-black">{elem.symbol}</span>
