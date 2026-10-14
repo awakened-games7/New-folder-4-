@@ -319,7 +319,7 @@ export default function BossRaidArena({
   const hpPercent = Math.round((bossHp / currentBoss.maxHp) * 100);
 
   return (
-    <div className="space-y-6 pb-12 animate-fadeIn">
+    <div id="arena-raid-view" className="space-y-6 pb-12 animate-fadeIn scroll-mt-24 sm:scroll-mt-28">
       {/* 1. TOP ARENA BANNER */}
       <div className="solo-window solo-bracket border-2 border-rose-500 rounded-sm overflow-hidden bg-gradient-to-r from-rose-950/80 via-black to-purple-950/80 shadow-[0_0_35px_rgba(255,40,90,0.4)]">
         <div className="solo-header-bar-danger">

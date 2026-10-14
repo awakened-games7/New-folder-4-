@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar, { TabType } from "../components/layout/Navbar";
 import HeroAwakening from "../components/layout/HeroAwakening";
 import StatusScreen from "../components/status/StatusScreen";
@@ -32,18 +32,171 @@ export default function Home() {
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
   const [isAriseOpen, setIsAriseOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [userProfile, setUserProfile] = useState<StudentHunterProfile | null>({
-    name: "Hunter Daniel",
-    email: "hunter@student.cbse.edu",
-    targetPercent: "95%+ (S-Rank)",
-    stream: "Science (PCM)",
-    rank: "S-RANK CANDIDATE",
-    level: 142,
-  });
+  const [userProfile, setUserProfile] = useState<StudentHunterProfile | null>(null);
+  const [archivesSubTab, setArchivesSubTab] = useState<"syllabus" | "bosses" | "cheatsheet">("syllabus");
 
-  const handleTabSelect = (tab: TabType) => {
+  // Load saved Hunter Profile from localStorage if previously signed in
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("realms_hunter_profile");
+      if (saved) {
+        setUserProfile(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error("Error loading hunter profile:", e);
+    }
+  }, []);
+
+  const handleSignInSuccess = (profile: StudentHunterProfile) => {
+    setUserProfile(profile);
+    try {
+      localStorage.setItem("realms_hunter_profile", JSON.stringify(profile));
+    } catch (e) {
+      console.error("Error saving hunter profile:", e);
+    }
+  };
+
+  const handleSignOut = () => {
+    setUserProfile(null);
+    try {
+      localStorage.removeItem("realms_hunter_profile");
+    } catch (e) {
+      console.error("Error clearing hunter profile:", e);
+    }
+  };
+
+  // Master Legendary Autonomous Smooth Scroll Engine
+  const smoothScrollToTarget = (
+    targetId?: string,
+    subTab?: "syllabus" | "bosses" | "cheatsheet"
+  ) => {
+    // Resolve intended element ID
+    let intendedId = targetId;
+    if (!intendedId) {
+      if (subTab === "syllabus") intendedId = "archives-grimoire";
+      else if (subTab === "cheatsheet") intendedId = "archives-cheatsheet";
+      else if (subTab === "bosses") intendedId = "archives-bosses";
+      else intendedId = "main-tab-content";
+    }
+
+    let attempts = 0;
+    const maxAttempts = 40; // check for up to ~1.2 seconds
+
+    const executeScroll = () => {
+      attempts++;
+
+      // Look for the primary target element
+      let el: HTMLElement | null = intendedId ? document.getElementById(intendedId) : null;
+
+      // If archives-grimoire is still mounting, try archives-tabs as secondary fallback
+      if (!el && intendedId === "archives-grimoire") {
+        el = document.getElementById("archives-tabs");
+      }
+
+      // If still not found after 6 attempts (~180ms), fall back to main-tab-content
+      if (!el && attempts > 6) {
+        el = document.getElementById("main-tab-content");
+      }
+
+      if (el) {
+        const yOffset = -75; // 75px clearance under fixed top navbar
+        const rect = el.getBoundingClientRect();
+        const currentScrollY =
+          window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+        const targetY = Math.max(0, rect.top + currentScrollY + yOffset);
+
+        // 1. Native smooth scroll to exact position
+        window.scrollTo({
+          top: targetY,
+          behavior: "smooth",
+        });
+
+        // 2. Also invoke scrollIntoView
+        try {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        } catch (e) {}
+
+        // 3. Trigger legendary neon activation glow
+        el.classList.remove("legendary-scroll-focus");
+        void el.offsetWidth; // force reflow
+        el.classList.add("legendary-scroll-focus");
+
+        // 4. Verification wave 1 at 250ms (adjusts if font or layout expansion shifted position)
+        setTimeout(() => {
+          const verifyEl = intendedId ? document.getElementById(intendedId) : null;
+          if (verifyEl) {
+            const vRect = verifyEl.getBoundingClientRect();
+            if (Math.abs(vRect.top - 75) > 35) {
+              const vScrollY =
+                window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+              window.scrollTo({
+                top: Math.max(0, vRect.top + vScrollY - 75),
+                behavior: "smooth",
+              });
+            }
+          }
+        }, 250);
+
+        // 5. Verification wave 2 at 500ms (guarantees final resting position is rock-solid)
+        setTimeout(() => {
+          const verifyEl2 = intendedId ? document.getElementById(intendedId) : null;
+          if (verifyEl2) {
+            const vRect2 = verifyEl2.getBoundingClientRect();
+            if (Math.abs(vRect2.top - 75) > 35) {
+              const vScrollY2 =
+                window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+              window.scrollTo({
+                top: Math.max(0, vRect2.top + vScrollY2 - 75),
+                behavior: "smooth",
+              });
+            }
+          }
+        }, 500);
+
+        return;
+      }
+
+      if (attempts < maxAttempts) {
+        setTimeout(executeScroll, 30);
+      }
+    };
+
+    // Start on next animation frame
+    requestAnimationFrame(executeScroll);
+  };
+
+  // Automatic smooth scroll to the selected option or tab content
+  const handleTabSelect = (
+    tab: TabType,
+    subTab?: "syllabus" | "bosses" | "cheatsheet",
+    targetSectionId?: string
+  ) => {
     sounds.playClick();
     setActiveTab(tab);
+    if (subTab) {
+      setArchivesSubTab(subTab);
+    }
+
+    // Determine target ID
+    let scrollTarget = targetSectionId;
+    if (tab === "all") {
+      if (targetSectionId) scrollTarget = targetSectionId;
+      else scrollTarget = "main-tab-content";
+    } else {
+      if (!scrollTarget) {
+        if (tab === "archives") {
+          scrollTarget = subTab === "cheatsheet" ? "archives-cheatsheet" : "archives-grimoire";
+        } else if (tab === "arena") {
+          scrollTarget = "arena-raid-view";
+        } else if (tab === "guild") {
+          scrollTarget = "guild-hub-view";
+        } else if (tab === "status") {
+          scrollTarget = "status-matrix-view";
+        }
+      }
+    }
+
+    smoothScrollToTarget(scrollTarget, subTab);
   };
 
   return (
@@ -51,13 +204,13 @@ export default function Home() {
       {/* Top Navbar */}
       <Navbar
         activeTab={activeTab}
-        setActiveTab={handleTabSelect}
+        setActiveTab={(tab) => handleTabSelect(tab)}
         onOpenAlerts={() => setIsAlertsOpen(true)}
         unreadCount={2}
         onTriggerArise={() => setIsAriseOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
         userProfile={userProfile}
-        onSignOut={() => setUserProfile(null)}
+        onSignOut={handleSignOut}
       />
 
       {/* Fixed Vertical Social Sidebar on the Right */}
@@ -71,6 +224,7 @@ export default function Home() {
           onNavigateTab={handleTabSelect}
           activeTab={activeTab}
           userProfile={userProfile}
+          onOpenAuth={() => setIsAuthOpen(true)}
         />
 
         {/* COMFORT MODE QUICK-SWITCHER BAR (Desktop sticky pill bar) */}
@@ -82,7 +236,7 @@ export default function Home() {
           <div className="flex items-center gap-2 flex-1 justify-start">
             {/* Mode 1: Status */}
             <button
-              onClick={() => handleTabSelect("status")}
+              onClick={() => handleTabSelect("status", undefined, "status-matrix-view")}
               className={`px-3 py-1.5 rounded text-xs font-orbitron font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                 activeTab === "status"
                   ? "bg-cyan-500 text-black border-2 border-cyan-200 shadow-[0_0_15px_#00f0ff] font-black"
@@ -95,7 +249,7 @@ export default function Home() {
 
             {/* Mode 2: Boss Arena */}
             <button
-              onClick={() => handleTabSelect("arena")}
+              onClick={() => handleTabSelect("arena", undefined, "arena-raid-view")}
               className={`px-3 py-1.5 rounded text-xs font-orbitron font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                 activeTab === "arena"
                   ? "bg-rose-500 text-white border-2 border-rose-200 shadow-[0_0_15px_#ff285a] font-black"
@@ -108,7 +262,7 @@ export default function Home() {
 
             {/* Mode 3: Archives */}
             <button
-              onClick={() => handleTabSelect("archives")}
+              onClick={() => handleTabSelect("archives", "syllabus", "archives-grimoire")}
               className={`px-3 py-1.5 rounded text-xs font-orbitron font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                 activeTab === "archives"
                   ? "bg-cyan-500 text-black border-2 border-cyan-200 shadow-[0_0_15px_#00f0ff] font-black"
@@ -121,7 +275,7 @@ export default function Home() {
 
             {/* Mode 4: Guild */}
             <button
-              onClick={() => handleTabSelect("guild")}
+              onClick={() => handleTabSelect("guild", undefined, "guild-hub-view")}
               className={`px-3 py-1.5 rounded text-xs font-orbitron font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                 activeTab === "guild"
                   ? "bg-purple-500 text-white border-2 border-purple-200 shadow-[0_0_15px_#c084fc] font-black"
@@ -134,7 +288,7 @@ export default function Home() {
 
             {/* Mode 5: All Modes Continuous View */}
             <button
-              onClick={() => handleTabSelect("all")}
+              onClick={() => handleTabSelect("all", undefined, "status-section")}
               className={`px-3 py-1.5 rounded text-xs font-orbitron font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                 activeTab === "all"
                   ? "bg-gradient-to-r from-amber-500 to-amber-600 text-black border-2 border-amber-200 shadow-[0_0_18px_#fbbf24] font-black"
@@ -147,99 +301,103 @@ export default function Home() {
           </div>
         </div>
 
-        {/* INDIVIDUAL TAB VIEW OR ALL-MODES STREAM */}
-        {activeTab === "status" && (
-          <div className="animate-fadeIn">
-            <StatusScreen
-              onTriggerArise={() => setIsAriseOpen(true)}
-              userProfile={userProfile}
-              onNavigateTab={(tab) => handleTabSelect(tab)}
-            />
-          </div>
-        )}
-
-        {activeTab === "arena" && (
-          <div className="animate-fadeIn">
-            <BossRaidArena onTriggerArise={() => setIsAriseOpen(true)} />
-          </div>
-        )}
-
-        {activeTab === "archives" && (
-          <div className="animate-fadeIn">
-            <ChemistryArchives />
-          </div>
-        )}
-
-        {activeTab === "guild" && (
-          <div className="animate-fadeIn">
-            <GuildHub />
-          </div>
-        )}
-
-        {/* ALL MODES CONTINUOUS VIEW (Comfort stream) */}
-        {activeTab === "all" && (
-          <div className="space-y-12 sm:space-y-16 animate-fadeIn">
-            {/* Section 1: Status Screen */}
-            <div id="status-section" className="space-y-4">
-              <div className="flex items-center gap-2.5 sm:gap-3 border-b-2 border-cyan-400 pb-2">
-                <span className="px-2.5 py-1 bg-cyan-500 text-black font-orbitron font-black text-[11px] sm:text-xs rounded shadow-[0_0_12px_#00f0ff]">
-                  MODE 01
-                </span>
-                <h2 className="text-lg sm:text-2xl font-orbitron font-black text-cyan-200 tracking-wide flex items-center gap-2">
-                  <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 shrink-0" />
-                  <span>STATUS MATRIX & ATTRIBUTES</span>
-                </h2>
-              </div>
+        {/* INDIVIDUAL TAB VIEW OR ALL-MODES STREAM WITH AUTO-SCROLL TARGET ANCHOR */}
+        <div id="main-tab-content" className="scroll-mt-24 sm:scroll-mt-28">
+          {activeTab === "status" && (
+            <div className="animate-fadeIn">
               <StatusScreen
                 onTriggerArise={() => setIsAriseOpen(true)}
                 userProfile={userProfile}
                 onNavigateTab={(tab) => handleTabSelect(tab)}
+                onOpenAuth={() => setIsAuthOpen(true)}
               />
             </div>
+          )}
 
-            {/* Section 2: Boss Arena */}
-            <div id="arena-section" className="space-y-4">
-              <div className="flex items-center gap-2.5 sm:gap-3 border-b-2 border-rose-500 pb-2">
-                <span className="px-2.5 py-1 bg-rose-500 text-white font-orbitron font-black text-[11px] sm:text-xs rounded shadow-[0_0_12px_#ff285a]">
-                  MODE 02
-                </span>
-                <h2 className="text-lg sm:text-2xl font-orbitron font-black text-rose-200 tracking-wide flex items-center gap-2">
-                  <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-rose-400 animate-pulse shrink-0" />
-                  <span>PYQ BOSS RAID ARENA</span>
-                </h2>
-              </div>
+          {activeTab === "arena" && (
+            <div className="animate-fadeIn">
               <BossRaidArena onTriggerArise={() => setIsAriseOpen(true)} />
             </div>
+          )}
 
-            {/* Section 3: Chemistry Archives */}
-            <div id="archives-section" className="space-y-4">
-              <div className="flex items-center gap-2.5 sm:gap-3 border-b-2 border-cyan-400 pb-2">
-                <span className="px-2.5 py-1 bg-cyan-500 text-black font-orbitron font-black text-[11px] sm:text-xs rounded shadow-[0_0_12px_#00f0ff]">
-                  MODE 03
-                </span>
-                <h2 className="text-lg sm:text-2xl font-orbitron font-black text-cyan-200 tracking-wide flex items-center gap-2">
-                  <FlaskConical className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 shrink-0" />
-                  <span>10-CHAPTER NCERT GRIMOIRE</span>
-                </h2>
-              </div>
-              <ChemistryArchives />
+          {activeTab === "archives" && (
+            <div className="animate-fadeIn">
+              <ChemistryArchives initialSubTab={archivesSubTab} />
             </div>
+          )}
 
-            {/* Section 4: Guild Hub */}
-            <div id="guild-section" className="space-y-4">
-              <div className="flex items-center gap-2.5 sm:gap-3 border-b-2 border-purple-500 pb-2">
-                <span className="px-2.5 py-1 bg-purple-500 text-white font-orbitron font-black text-[11px] sm:text-xs rounded shadow-[0_0_12px_#c084fc]">
-                  MODE 04
-                </span>
-                <h2 className="text-lg sm:text-2xl font-orbitron font-black text-purple-200 tracking-wide flex items-center gap-2">
-                  <Users className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400 shrink-0" />
-                  <span>GUILD & SOCIAL HOTLINES</span>
-                </h2>
-              </div>
+          {activeTab === "guild" && (
+            <div className="animate-fadeIn">
               <GuildHub />
             </div>
-          </div>
-        )}
+          )}
+
+          {/* ALL MODES CONTINUOUS VIEW (Comfort stream) */}
+          {activeTab === "all" && (
+            <div className="space-y-12 sm:space-y-16 animate-fadeIn">
+              {/* Section 1: Status Screen */}
+              <div id="status-section" className="space-y-4 scroll-mt-24 sm:scroll-mt-28">
+                <div className="flex items-center gap-2.5 sm:gap-3 border-b-2 border-cyan-400 pb-2">
+                  <span className="px-2.5 py-1 bg-cyan-500 text-black font-orbitron font-black text-[11px] sm:text-xs rounded shadow-[0_0_12px_#00f0ff]">
+                    MODE 01
+                  </span>
+                  <h2 className="text-lg sm:text-2xl font-orbitron font-black text-cyan-200 tracking-wide flex items-center gap-2">
+                    <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 shrink-0" />
+                    <span>STATUS MATRIX & ATTRIBUTES</span>
+                  </h2>
+                </div>
+                <StatusScreen
+                  onTriggerArise={() => setIsAriseOpen(true)}
+                  userProfile={userProfile}
+                  onNavigateTab={(tab) => handleTabSelect(tab)}
+                  onOpenAuth={() => setIsAuthOpen(true)}
+                />
+              </div>
+
+              {/* Section 2: Boss Arena */}
+              <div id="arena-section" className="space-y-4 scroll-mt-24 sm:scroll-mt-28">
+                <div className="flex items-center gap-2.5 sm:gap-3 border-b-2 border-rose-500 pb-2">
+                  <span className="px-2.5 py-1 bg-rose-500 text-white font-orbitron font-black text-[11px] sm:text-xs rounded shadow-[0_0_12px_#ff285a]">
+                    MODE 02
+                  </span>
+                  <h2 className="text-lg sm:text-2xl font-orbitron font-black text-rose-200 tracking-wide flex items-center gap-2">
+                    <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-rose-400 animate-pulse shrink-0" />
+                    <span>PYQ BOSS RAID ARENA</span>
+                  </h2>
+                </div>
+                <BossRaidArena onTriggerArise={() => setIsAriseOpen(true)} />
+              </div>
+
+              {/* Section 3: Chemistry Archives */}
+              <div id="archives-section" className="space-y-4 scroll-mt-24 sm:scroll-mt-28">
+                <div className="flex items-center gap-2.5 sm:gap-3 border-b-2 border-cyan-400 pb-2">
+                  <span className="px-2.5 py-1 bg-cyan-500 text-black font-orbitron font-black text-[11px] sm:text-xs rounded shadow-[0_0_12px_#00f0ff]">
+                    MODE 03
+                  </span>
+                  <h2 className="text-lg sm:text-2xl font-orbitron font-black text-cyan-200 tracking-wide flex items-center gap-2">
+                    <FlaskConical className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 shrink-0" />
+                    <span>10-CHAPTER NCERT GRIMOIRE</span>
+                  </h2>
+                </div>
+                <ChemistryArchives initialSubTab={archivesSubTab} />
+              </div>
+
+              {/* Section 4: Guild Hub */}
+              <div id="guild-section" className="space-y-4 scroll-mt-24 sm:scroll-mt-28">
+                <div className="flex items-center gap-2.5 sm:gap-3 border-b-2 border-purple-500 pb-2">
+                  <span className="px-2.5 py-1 bg-purple-500 text-white font-orbitron font-black text-[11px] sm:text-xs rounded shadow-[0_0_12px_#c084fc]">
+                    MODE 04
+                  </span>
+                  <h2 className="text-lg sm:text-2xl font-orbitron font-black text-purple-200 tracking-wide flex items-center gap-2">
+                    <Users className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400 shrink-0" />
+                    <span>GUILD & SOCIAL HOTLINES</span>
+                  </h2>
+                </div>
+                <GuildHub />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Floating System Status Footer (Hidden on small mobile screens to prevent dock overlap) */}
@@ -291,7 +449,7 @@ export default function Home() {
       <GoogleAuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
-        onSignInSuccess={(profile) => setUserProfile(profile)}
+        onSignInSuccess={handleSignInSuccess}
       />
     </main>
   );

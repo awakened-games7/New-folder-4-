@@ -16,6 +16,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: #030712;
   color: #ffffff;
@@ -24,6 +28,21 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+}
+
+/* Legendary Section Activation Pulse */
+@keyframes sectionGlowPulse {
+  0% {
+    box-shadow: 0 0 50px rgba(0, 240, 255, 0.8), inset 0 0 30px rgba(0, 240, 255, 0.4);
+    border-color: #00f0ff;
+  }
+  100% {
+    box-shadow: 0 0 35px rgba(0, 240, 255, 0.35);
+  }
+}
+
+.legendary-scroll-focus {
+  animation: sectionGlowPulse 1.2s ease-out;
 }
 
 /* Custom Scrollbar */

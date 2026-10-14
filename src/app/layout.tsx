@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark bg-black">
+    <html lang="en" className="dark bg-black scroll-smooth">
       <body className="bg-black text-slate-100 min-h-screen relative overflow-x-hidden antialiased">
         {/* Three.js Particle Background */}
         <ParticleBackground />

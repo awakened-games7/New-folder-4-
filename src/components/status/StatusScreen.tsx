@@ -90,10 +90,12 @@ export default function StatusScreen({
   onTriggerArise,
   userProfile,
   onNavigateTab,
+  onOpenAuth,
 }: {
   onTriggerArise?: () => void;
   userProfile?: StudentHunterProfile | null;
   onNavigateTab?: (tab: "status" | "archives" | "guild") => void;
+  onOpenAuth?: () => void;
 }) {
   // Target: February 15, 2027 at 09:00:00 AM IST
   const targetDate = new Date("2027-02-15T09:00:00+05:30").getTime();
@@ -176,7 +178,7 @@ export default function StatusScreen({
   };
 
   return (
-    <div className="space-y-8 pb-16 animate-fadeIn">
+    <div id="status-matrix-view" className="space-y-8 pb-16 animate-fadeIn scroll-mt-24 sm:scroll-mt-28">
       {/* 1. VIBRANT DUNGEON BREAK COUNTDOWN WINDOW (CRIMSON & ELECTRIC NEON) */}
       <div className="solo-window-danger solo-bracket solo-bracket-danger rounded-sm overflow-hidden border-2 border-rose-500 shadow-[0_0_45px_rgba(255,40,90,0.5)]">
         {/* Window Header Bar */}
@@ -285,9 +287,13 @@ export default function StatusScreen({
             <span className="font-orbitron text-xs font-bold text-cyan-300 tracking-wider">
               [ STATUS MATRIX // PLAYER INTERFACE ]
             </span>
-            <span className="text-xs font-mono text-amber-400 font-bold flex items-center gap-1">
-              <Crown className="w-3.5 h-3.5 text-amber-400" />
-              S-CLASS MONARCH
+            <span
+              className={`text-xs font-mono font-bold flex items-center gap-1 ${
+                userProfile ? "text-amber-400" : "text-slate-400"
+              }`}
+            >
+              <Crown className="w-3.5 h-3.5" />
+              {userProfile ? "S-CLASS MONARCH" : "UNAWAKENED HUNTER"}
             </span>
           </div>
 
@@ -296,17 +302,39 @@ export default function StatusScreen({
               <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold">
                 HUNTER IDENTITY
               </span>
-              <h3 className="text-2xl sm:text-3xl font-orbitron font-black text-cyan-100 text-glow-blue mt-0.5">
-                {userProfile ? userProfile.name : "HUNTER"}
-              </h3>
+              {userProfile ? (
+                <h3 className="text-2xl sm:text-3xl font-orbitron font-black text-cyan-100 text-glow-blue mt-0.5">
+                  {userProfile.name}
+                </h3>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2.5 mt-2">
+                  <button
+                    onClick={() => {
+                      sounds.playAlert();
+                      onOpenAuth?.();
+                    }}
+                    className="px-3.5 py-1.5 bg-gradient-to-r from-cyan-500 via-teal-400 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-orbitron font-black text-xs uppercase tracking-wider rounded shadow-[0_0_15px_#00f0ff] transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-black animate-pulse" />
+                    <span>SIGN IN / AWAKEN</span>
+                  </button>
+                  <span className="text-xs font-mono text-slate-400">
+                    [ GUEST CANDIDATE ]
+                  </span>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-2.5 mt-3 text-xs font-rajdhani">
                 <div className="bg-black/70 p-2.5 rounded border border-purple-500/40">
                   <span className="text-slate-400 block text-[10px] font-mono uppercase">JOB CLASS</span>
-                  <span className="text-purple-300 font-bold font-orbitron">ALCHEMICAL MONARCH</span>
+                  <span className="text-purple-300 font-bold font-orbitron">
+                    {userProfile ? "ALCHEMICAL MONARCH" : "UNAWAKENED"}
+                  </span>
                 </div>
                 <div className="bg-black/70 p-2.5 rounded border border-cyan-500/40">
                   <span className="text-slate-400 block text-[10px] font-mono uppercase">TITLE</span>
-                  <span className="text-cyan-300 font-bold font-orbitron">CLASS 12 TOPPER</span>
+                  <span className="text-cyan-300 font-bold font-orbitron">
+                    {userProfile ? "CLASS 12 TOPPER" : "CBSE CANDIDATE"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -316,11 +344,16 @@ export default function StatusScreen({
               <div className="bg-black/80 p-3.5 rounded border border-cyan-400/50 shadow-inner">
                 <span className="text-[10px] font-mono text-cyan-300 font-bold uppercase">LEVEL</span>
                 <div className="text-3xl font-orbitron font-black text-cyan-200 text-glow-blue">
-                  142
+                  {userProfile ? userProfile.level : "--"}
                 </div>
-                <span className="text-[10px] text-slate-300 mt-1 block font-mono">EXP: 84,200 / 100,000</span>
+                <span className="text-[10px] text-slate-300 mt-1 block font-mono">
+                  {userProfile ? "EXP: 84,200 / 100,000" : "SIGN IN TO TRACK EXP"}
+                </span>
                 <div className="w-full h-2 bg-slate-950 rounded-full mt-1.5 overflow-hidden border border-slate-800">
-                  <div className="h-full exp-bar-fill w-[84.2%]" />
+                  <div
+                    className="h-full exp-bar-fill"
+                    style={{ width: userProfile ? "84.2%" : "0%" }}
+                  />
                 </div>
               </div>
 

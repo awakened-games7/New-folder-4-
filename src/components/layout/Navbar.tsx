@@ -74,10 +74,8 @@ export default function Navbar({
   };
 
   const handleTabClick = (tab: TabType) => {
-    if (activeTab !== tab) {
-      sounds.playClick();
-      setActiveTab(tab);
-    }
+    sounds.playClick();
+    setActiveTab(tab);
   };
 
   return (
@@ -102,11 +100,11 @@ export default function Navbar({
 
             <div className="hidden xl:flex items-center gap-2 px-2.5 py-0.5 bg-cyan-950/80 border border-cyan-400/60 rounded text-xs font-orbitron">
               <span className="text-amber-300 font-bold">
-                {userProfile ? userProfile.rank : "RANK: S-CANDIDATE"}
+                {userProfile ? userProfile.rank : "RANK: UNAWAKENED"}
               </span>
               <span className="text-cyan-500">|</span>
               <span className="text-cyan-200">
-                {userProfile ? `TARGET: ${userProfile.targetPercent}` : "CLASS 12"}
+                {userProfile ? `TARGET: ${userProfile.targetPercent}` : "CBSE CLASS 12"}
               </span>
             </div>
           </div>

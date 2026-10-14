@@ -370,7 +370,11 @@ const CBSE_CHEMISTRY_CHAPTERS: ChemistryChapter[] = [
   },
 ];
 
-export default function ChemistryArchives() {
+interface ChemistryArchivesProps {
+  initialSubTab?: "syllabus" | "bosses" | "cheatsheet";
+}
+
+export default function ChemistryArchives({ initialSubTab = "syllabus" }: ChemistryArchivesProps = {}) {
   // Release Date: 10.09.2026 (September 10, 2026)
   const releaseDate = new Date("2026-09-10T00:00:00+05:30").getTime();
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -408,7 +412,15 @@ export default function ChemistryArchives() {
   const [expandedChapterIds, setExpandedChapterIds] = useState<Set<string>>(new Set(["solutions"]));
   const [categoryFilter, setCategoryFilter] = useState<"All" | "Physical" | "Inorganic" | "Organic">("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeSubTab, setActiveSubTab] = useState<"syllabus" | "bosses" | "cheatsheet">("syllabus");
+  const [activeSubTab, setActiveSubTab] = useState<"syllabus" | "bosses" | "cheatsheet">(
+    initialSubTab || "syllabus"
+  );
+
+  useEffect(() => {
+    if (initialSubTab) {
+      setActiveSubTab(initialSubTab);
+    }
+  }, [initialSubTab]);
   const [copiedFormula, setCopiedFormula] = useState<string | null>(null);
 
   const toggleExpandChapter = (id: string) => {
@@ -610,11 +622,18 @@ export default function ChemistryArchives() {
       </div>
 
       {/* 2. ARCHIVES SUB-NAVIGATION TABS */}
-      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-black/80 rounded-sm border-2 border-cyan-500/40">
+      <div id="archives-tabs" className="flex flex-wrap items-center gap-2 p-1.5 bg-black/80 rounded-sm border-2 border-cyan-500/40 scroll-mt-24 sm:scroll-mt-28">
         <button
           onClick={() => {
             sounds.playClick();
             setActiveSubTab("syllabus");
+            setTimeout(() => {
+              const el = document.getElementById("archives-grimoire") || document.getElementById("archives-tabs");
+              if (el) {
+                const y = el.getBoundingClientRect().top + (window.scrollY || window.pageYOffset) - 75;
+                window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+              }
+            }, 60);
           }}
           className={`flex-1 min-w-[200px] py-2.5 px-4 rounded-sm font-orbitron text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
             activeSubTab === "syllabus"
@@ -630,6 +649,13 @@ export default function ChemistryArchives() {
           onClick={() => {
             sounds.playClick();
             setActiveSubTab("bosses");
+            setTimeout(() => {
+              const el = document.getElementById("archives-bosses") || document.getElementById("archives-tabs");
+              if (el) {
+                const y = el.getBoundingClientRect().top + (window.scrollY || window.pageYOffset) - 75;
+                window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+              }
+            }, 60);
           }}
           className={`flex-1 min-w-[200px] py-2.5 px-4 rounded-sm font-orbitron text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
             activeSubTab === "bosses"
@@ -645,6 +671,13 @@ export default function ChemistryArchives() {
           onClick={() => {
             sounds.playClick();
             setActiveSubTab("cheatsheet");
+            setTimeout(() => {
+              const el = document.getElementById("archives-cheatsheet") || document.getElementById("archives-tabs");
+              if (el) {
+                const y = el.getBoundingClientRect().top + (window.scrollY || window.pageYOffset) - 75;
+                window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+              }
+            }, 60);
           }}
           className={`flex-1 min-w-[200px] py-2.5 px-4 rounded-sm font-orbitron text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
             activeSubTab === "cheatsheet"
@@ -659,7 +692,7 @@ export default function ChemistryArchives() {
 
       {/* SUB-TAB 1: CBSE CLASS 12TH CHEMISTRY CHAPTER & TOPIC MASTERY CHECKLIST GRIMOIRE */}
       {activeSubTab === "syllabus" && (
-        <div className="solo-window solo-bracket rounded-sm overflow-hidden border-2 border-cyan-400 space-y-6">
+        <div id="archives-grimoire" className="solo-window solo-bracket rounded-sm overflow-hidden border-2 border-cyan-400 space-y-6 scroll-mt-24 sm:scroll-mt-28">
           <div className="solo-header-bar">
             <div className="flex items-center gap-2 font-orbitron text-xs font-black text-cyan-300 tracking-widest uppercase">
               <BookOpen className="w-4 h-4 text-cyan-400" />
@@ -946,7 +979,7 @@ export default function ChemistryArchives() {
 
       {/* SUB-TAB 2: GAME BOSS RAIDS & COMBAT ENGINE */}
       {activeSubTab === "bosses" && (
-        <div className="space-y-6">
+        <div id="archives-bosses" className="space-y-6 scroll-mt-24 sm:scroll-mt-28">
           {/* Boss Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
@@ -1106,7 +1139,7 @@ export default function ChemistryArchives() {
 
       {/* SUB-TAB 3: FORMULA MATRIX & BOARD CHEAT ENGINE */}
       {activeSubTab === "cheatsheet" && (
-        <div className="solo-window solo-bracket rounded-sm overflow-hidden border-2 border-amber-400 space-y-6">
+        <div id="archives-cheatsheet" className="solo-window solo-bracket rounded-sm overflow-hidden border-2 border-amber-400 space-y-6 scroll-mt-24 sm:scroll-mt-28">
           <div className="solo-header-bar">
             <div className="flex items-center gap-2 font-orbitron text-xs font-bold text-amber-300">
               <Zap className="w-4 h-4 text-amber-400" />

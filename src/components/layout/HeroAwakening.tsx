@@ -31,9 +31,10 @@ import { TabType } from "./Navbar";
 
 interface HeroAwakeningProps {
   onTriggerArise: () => void;
-  onNavigateTab: (tab: TabType) => void;
+  onNavigateTab: (tab: TabType, subTab?: "syllabus" | "bosses" | "cheatsheet", targetSectionId?: string) => void;
   activeTab: TabType;
   userProfile: StudentHunterProfile | null;
+  onOpenAuth?: () => void;
 }
 
 export default function HeroAwakening({
@@ -41,6 +42,7 @@ export default function HeroAwakening({
   onNavigateTab,
   activeTab,
   userProfile,
+  onOpenAuth,
 }: HeroAwakeningProps) {
   const targetDate = new Date("2027-02-15T09:00:00+05:30").getTime();
   const [timeLeft, setTimeLeft] = useState({
@@ -172,29 +174,62 @@ export default function HeroAwakening({
                   PLAYER STATUS CARD
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-amber-300 font-bold px-2 py-0.5 rounded bg-amber-950 border border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.4)]">
-                S-RANK
+              <span
+                className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                  userProfile
+                    ? "text-amber-300 bg-amber-950 border border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.4)]"
+                    : "text-slate-300 bg-slate-900 border border-slate-600"
+                }`}
+              >
+                {userProfile ? userProfile.rank : "NOT SIGNED IN"}
               </span>
             </div>
 
             <div className="py-3 space-y-2.5 font-mono text-xs">
               <div className="flex justify-between items-center">
                 <span className="text-slate-400">HUNTER:</span>
-                <span className="text-cyan-200 font-bold font-orbitron">
-                  {userProfile ? userProfile.name : "HUNTER DANIEL"}
-                </span>
+                {userProfile ? (
+                  <span className="text-cyan-200 font-bold font-orbitron">
+                    {userProfile.name}
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => {
+                      sounds.playAlert();
+                      onOpenAuth?.();
+                    }}
+                    className="px-2.5 py-1 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-orbitron font-black text-[11px] rounded shadow-[0_0_12px_#00f0ff] transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5"
+                    title="Click to Sign In and Awaken"
+                  >
+                    <Sparkles className="w-3 h-3 text-black animate-pulse" />
+                    <span>SIGN IN</span>
+                  </button>
+                )}
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-slate-400">CLASS:</span>
-                <span className="text-purple-300 font-bold">ALCHEMICAL MONARCH</span>
+                <span className="text-purple-300 font-bold">
+                  {userProfile ? "ALCHEMICAL MONARCH" : "UNAWAKENED"}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-slate-400">LEVEL:</span>
-                <span className="text-cyan-300 font-black font-orbitron text-sm">LV. 142</span>
+                <span className="text-cyan-300 font-black font-orbitron text-sm">
+                  {userProfile ? `LV. ${userProfile.level}` : "LV. --"}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-slate-400">TARGET:</span>
-                <span className="text-emerald-300 font-bold">95%+ (CBSE BOARD)</span>
+                {userProfile ? (
+                  <span className="text-emerald-300 font-bold">{userProfile.targetPercent}</span>
+                ) : (
+                  <button
+                    onClick={() => onOpenAuth?.()}
+                    className="text-emerald-400 hover:text-emerald-300 font-bold underline decoration-dotted text-[11px]"
+                  >
+                    95%+ (SET ON SIGN IN)
+                  </button>
+                )}
               </div>
             </div>
 
@@ -203,7 +238,7 @@ export default function HeroAwakening({
               <button
                 onClick={() => {
                   sounds.playClick();
-                  onNavigateTab("status");
+                  onNavigateTab("status", undefined, "status-matrix-view");
                 }}
                 className={`p-2.5 rounded text-center border font-bold transition-all min-h-[38px] flex items-center justify-center ${
                   activeTab === "status"
@@ -217,7 +252,7 @@ export default function HeroAwakening({
               <button
                 onClick={() => {
                   sounds.playClick();
-                  onNavigateTab("arena");
+                  onNavigateTab("arena", undefined, "arena-raid-view");
                 }}
                 className={`p-2.5 rounded text-center border font-bold transition-all min-h-[38px] flex items-center justify-center ${
                   activeTab === "arena"
@@ -231,7 +266,7 @@ export default function HeroAwakening({
               <button
                 onClick={() => {
                   sounds.playClick();
-                  onNavigateTab("archives");
+                  onNavigateTab("archives", "syllabus", "archives-grimoire");
                 }}
                 className={`p-2.5 rounded text-center border font-bold transition-all min-h-[38px] flex items-center justify-center ${
                   activeTab === "archives"
@@ -245,7 +280,7 @@ export default function HeroAwakening({
               <button
                 onClick={() => {
                   sounds.playClick();
-                  onNavigateTab("guild");
+                  onNavigateTab("guild", undefined, "guild-hub-view");
                 }}
                 className={`p-2.5 rounded text-center border font-bold transition-all min-h-[38px] flex items-center justify-center ${
                   activeTab === "guild"
@@ -266,7 +301,7 @@ export default function HeroAwakening({
         <div
           onClick={() => {
             sounds.playClick();
-            onNavigateTab("archives");
+            onNavigateTab("archives", "syllabus", "archives-grimoire");
           }}
           className="solo-window solo-bracket p-4 rounded-sm border-2 border-cyan-400 bg-gradient-to-b from-cyan-950/80 to-black hover:border-cyan-300 cursor-pointer transition-all hover:scale-[1.02] shadow-[0_0_20px_rgba(0,240,255,0.25)] group"
         >
@@ -294,7 +329,7 @@ export default function HeroAwakening({
         <div
           onClick={() => {
             sounds.playClick();
-            onNavigateTab("arena");
+            onNavigateTab("arena", undefined, "arena-raid-view");
           }}
           className="solo-window-danger solo-bracket solo-bracket-danger p-4 rounded-sm border-2 border-rose-500 bg-gradient-to-b from-rose-950/80 to-black hover:border-rose-400 cursor-pointer transition-all hover:scale-[1.02] shadow-[0_0_20px_rgba(255,40,90,0.3)] group"
         >
@@ -322,7 +357,7 @@ export default function HeroAwakening({
         <div
           onClick={() => {
             sounds.playClick();
-            onNavigateTab("archives");
+            onNavigateTab("archives", "cheatsheet", "archives-cheatsheet");
           }}
           className="solo-window-amber solo-bracket p-4 rounded-sm border-2 border-amber-400 bg-gradient-to-b from-amber-950/80 to-black hover:border-amber-300 cursor-pointer transition-all hover:scale-[1.02] shadow-[0_0_20px_rgba(251,191,36,0.25)] group"
         >
@@ -350,7 +385,7 @@ export default function HeroAwakening({
         <div
           onClick={() => {
             sounds.playClick();
-            onNavigateTab("guild");
+            onNavigateTab("guild", undefined, "guild-hub-view");
           }}
           className="solo-window-purple solo-bracket solo-bracket-purple p-4 rounded-sm border-2 border-purple-400 bg-gradient-to-b from-purple-950/80 to-black hover:border-purple-300 cursor-pointer transition-all hover:scale-[1.02] shadow-[0_0_20px_rgba(168,85,247,0.25)] group"
         >

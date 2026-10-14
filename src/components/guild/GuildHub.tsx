@@ -150,7 +150,7 @@ export default function GuildHub() {
   };
 
   return (
-    <div className="space-y-6 pb-12 animate-fadeIn">
+    <div id="guild-hub-view" className="space-y-6 pb-12 animate-fadeIn scroll-mt-24 sm:scroll-mt-28">
       {/* 1. TOP GUILD HEADER WINDOW */}
       <div className="solo-window solo-bracket rounded-sm overflow-hidden border-2 border-cyan-400">
         <div className="solo-header-bar">
