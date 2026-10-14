@@ -127,19 +127,19 @@ export default function Navbar({
               )}
             </button>
 
-            {/* Tab 2: Boss Raid Arena */}
+            {/* Tab 2: Alchemy Lab */}
             <button
               onClick={() => handleTabClick("arena")}
               className={`relative flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-sm font-orbitron text-[11px] sm:text-xs tracking-wider uppercase transition-all duration-300 ${
                 activeTab === "arena"
-                  ? "bg-rose-500 text-white border-2 border-rose-200 shadow-[0_0_20px_rgba(255,40,90,0.7)] font-black"
-                  : "text-rose-300 hover:text-rose-100 hover:bg-rose-950/40 border border-transparent"
+                  ? "bg-emerald-500 text-black border-2 border-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.7)] font-black"
+                  : "text-emerald-300 hover:text-emerald-100 hover:bg-emerald-950/40 border border-transparent"
               }`}
             >
-              <Flame className={`w-3.5 h-3.5 ${activeTab === "arena" ? "text-white" : "text-rose-400 animate-pulse"}`} />
-              <span>BOSS ARENA</span>
+              <FlaskConical className={`w-3.5 h-3.5 ${activeTab === "arena" ? "text-black" : "text-emerald-400 animate-pulse"}`} />
+              <span>ALCHEMY</span>
               {activeTab === "arena" && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-white" />
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-black" />
               )}
             </button>
 
@@ -287,17 +287,17 @@ export default function Navbar({
           <span className="text-[9px] font-orbitron mt-0.5">STATUS</span>
         </button>
 
-        {/* Mobile Tab 2: Boss Arena */}
+        {/* Mobile Tab 2: Alchemy Lab */}
         <button
           onClick={() => handleTabClick("arena")}
           className={`flex flex-col items-center justify-center py-1 px-2 rounded transition-all ${
             activeTab === "arena"
-              ? "text-rose-400 font-bold drop-shadow-[0_0_10px_#ff285a]"
+              ? "text-emerald-400 font-bold drop-shadow-[0_0_10px_#10b981]"
               : "text-slate-400 hover:text-slate-200"
           }`}
         >
-          <Flame className={`w-5 h-5 ${activeTab === "arena" ? "text-rose-400 stroke-[2.5] animate-pulse" : "text-slate-400"}`} />
-          <span className="text-[9px] font-orbitron mt-0.5">ARENA</span>
+          <FlaskConical className={`w-5 h-5 ${activeTab === "arena" ? "text-emerald-400 stroke-[2.5]" : "text-slate-400"}`} />
+          <span className="text-[9px] font-orbitron mt-0.5">LAB</span>
         </button>
 
         {/* Mobile Tab 3: Archives (10 Chapters) */}

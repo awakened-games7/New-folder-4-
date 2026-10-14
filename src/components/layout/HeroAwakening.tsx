@@ -23,6 +23,7 @@ import {
   Users,
   Download,
   CheckCircle2,
+  FlaskConical,
 } from "lucide-react";
 import { sounds } from "../audio/soundEffects";
 import { GAME_METADATA } from "../archives/ChemistryArchives";
@@ -256,11 +257,11 @@ export default function HeroAwakening({
                 }}
                 className={`p-2.5 rounded text-center border font-bold transition-all min-h-[38px] flex items-center justify-center ${
                   activeTab === "arena"
-                    ? "bg-rose-500 text-white border-rose-200 font-black shadow-[0_0_15px_#ff285a]"
-                    : "bg-black/80 text-rose-300 border-rose-500/50 hover:border-rose-300 hover:bg-rose-950/40"
+                    ? "bg-emerald-500 text-black border-emerald-200 font-black shadow-[0_0_15px_#10b981]"
+                    : "bg-black/80 text-emerald-300 border-emerald-500/50 hover:border-emerald-300 hover:bg-emerald-950/40"
                 }`}
               >
-                ⚔️ BOSS ARENA
+                ⚗️ ALCHEMY LAB
               </button>
 
               <button
@@ -325,30 +326,30 @@ export default function HeroAwakening({
           </div>
         </div>
 
-        {/* Feature 2: Boss Raid Arena */}
+        {/* Feature 2: Virtual Alchemy Lab */}
         <div
           onClick={() => {
             sounds.playClick();
             onNavigateTab("arena", undefined, "arena-raid-view");
           }}
-          className="solo-window-danger solo-bracket solo-bracket-danger p-4 rounded-sm border-2 border-rose-500 bg-gradient-to-b from-rose-950/80 to-black hover:border-rose-400 cursor-pointer transition-all hover:scale-[1.02] shadow-[0_0_20px_rgba(255,40,90,0.3)] group"
+          className="solo-window solo-bracket p-4 rounded-sm border-2 border-emerald-500 bg-gradient-to-b from-emerald-950/80 to-black hover:border-emerald-400 cursor-pointer transition-all hover:scale-[1.02] shadow-[0_0_20px_rgba(16,185,129,0.3)] group"
         >
           <div className="flex items-center justify-between mb-2">
-            <div className="w-8 h-8 rounded bg-rose-500/20 border border-rose-400 flex items-center justify-center text-rose-300 group-hover:shadow-[0_0_15px_#ff285a]">
-              <Sword className="w-4 h-4" />
+            <div className="w-8 h-8 rounded bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-300 group-hover:shadow-[0_0_15px_#10b981]">
+              <Atom className="w-4 h-4" />
             </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 border border-rose-400 text-rose-300 font-bold">
-              PYQ COMBAT
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 border border-emerald-400 text-emerald-300 font-bold">
+              ALCHEMY
             </span>
           </div>
-          <h3 className="font-orbitron font-bold text-sm text-rose-200 group-hover:text-rose-100">
-            PYQ BOSS RAID ARENA
+          <h3 className="font-orbitron font-bold text-sm text-emerald-200 group-hover:text-emerald-100">
+            VIRTUAL ALCHEMY LAB
           </h3>
           <p className="text-xs text-slate-300 font-rajdhani mt-1 line-clamp-2">
-            Battle 4 CBSE Calamity Bosses using real 10-year board questions, formula attacks, combo multipliers & sound FX.
+            Mix 16 reagents in an interactive reaction chamber — see precipitates, color changes, gas evolution & CBSE NCERT explanations.
           </p>
-          <div className="mt-3 pt-2 border-t border-rose-500/30 flex items-center justify-between text-[11px] font-orbitron font-bold text-rose-400">
-            <span>ENTER ARENA</span>
+          <div className="mt-3 pt-2 border-t border-emerald-500/30 flex items-center justify-between text-[11px] font-orbitron font-bold text-emerald-400">
+            <span>ENTER LAB</span>
             <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
           </div>
         </div>

@@ -309,3 +309,311 @@ body {
   animation: floatGentle 4s ease-in-out infinite;
 }
 
+/* ═══ VIRTUAL ALCHEMY LAB ANIMATIONS ═══ */
+
+/* Bubble rising animation */
+@keyframes bubbleRise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-180px) scale(0.3);
+    opacity: 0;
+  }
+}
+
+.animate-bubble {
+  animation: bubbleRise 2s ease-out infinite;
+}
+
+/* Precipitate settling */
+@keyframes precipitateSettle {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(5%);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+}
+
+.animate-precipitate-settle {
+  animation: precipitateSettle 2s ease-out forwards;
+}
+
+/* Floating precipitate particles */
+@keyframes precipitateParticle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateY(15px) translateX(5px);
+  }
+  50% {
+    transform: translateY(30px) translateX(-3px);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(50px) translateX(4px);
+  }
+  100% {
+    transform: translateY(80px) translateX(0);
+    opacity: 0;
+  }
+}
+
+.animate-precipitate-particle {
+  animation: precipitateParticle 3s ease-in forwards;
+}
+
+/* Custom scrollbar for reagent vault */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.4);
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.7);
+}
+
+/* ═══ REALISTIC ORGANIC RED FLAME ENGINE ═══ */
+
+/* Outer flame tongue flickering and dancing */
+@keyframes flameLick1 {
+  0%, 100% {
+    transform: scale(1, 1) translate(0, 0) rotate(0deg);
+    border-radius: 50% 50% 20% 20% / 60% 60% 40% 40%;
+  }
+  25% {
+    transform: scale(0.96, 1.08) translate(-2px, -3px) rotate(-2deg);
+    border-radius: 45% 55% 25% 15% / 65% 55% 45% 35%;
+  }
+  50% {
+    transform: scale(1.05, 0.94) translate(3px, 1px) rotate(2.5deg);
+    border-radius: 55% 45% 15% 25% / 55% 65% 35% 45%;
+  }
+  75% {
+    transform: scale(0.97, 1.05) translate(-1px, -2px) rotate(-1deg);
+    border-radius: 48% 52% 22% 18% / 62% 58% 42% 38%;
+  }
+}
+
+/* Secondary asynchronous inner flame tongue */
+@keyframes flameLick2 {
+  0%, 100% {
+    transform: scale(0.92, 0.95) translate(1px, 2px) rotate(1deg);
+    border-radius: 50% 50% 30% 30% / 60% 60% 40% 40%;
+  }
+  30% {
+    transform: scale(1.03, 1.07) translate(-2px, -4px) rotate(-2.5deg);
+    border-radius: 40% 60% 35% 25% / 65% 55% 45% 35%;
+  }
+  60% {
+    transform: scale(0.94, 0.97) translate(2px, 0px) rotate(2deg);
+    border-radius: 60% 40% 25% 35% / 55% 65% 35% 45%;
+  }
+  80% {
+    transform: scale(1.02, 1.04) translate(-1px, -2px) rotate(-1.5deg);
+  }
+}
+
+/* Superheated hot core pulse */
+@keyframes flameCore {
+  0%, 100% {
+    transform: scale(1, 1) translate(0, 0);
+    opacity: 0.92;
+  }
+  35% {
+    transform: scale(0.9, 1.15) translate(1px, -2px);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1.1, 0.88) translate(-1px, 1px);
+    opacity: 0.85;
+  }
+}
+
+/* Floating ember sparks drifting upwards */
+@keyframes emberRise1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-14px, -45px) scale(0.85);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-26px, -95px) scale(0.2);
+    opacity: 0;
+  }
+}
+
+@keyframes emberRise2 {
+  0% {
+    transform: translate(0, 0) scale(0.9);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(16px, -55px) scale(0.75);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(30px, -110px) scale(0.1);
+    opacity: 0;
+  }
+}
+
+@keyframes emberRise3 {
+  0% {
+    transform: translate(0, 0) scale(1.1);
+    opacity: 1;
+  }
+  60% {
+    transform: translate(-8px, -65px) scale(0.6);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(12px, -125px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Radial ambient red light glow */
+@keyframes flameHaloPulse {
+  0%, 100% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.12);
+  }
+}
+
+.animate-flame-lick1 {
+  animation: flameLick1 0.42s ease-in-out infinite;
+}
+
+.animate-flame-lick2 {
+  animation: flameLick2 0.32s ease-in-out infinite;
+}
+
+.animate-flame-core {
+  animation: flameCore 0.22s ease-in-out infinite;
+}
+
+.animate-ember1 {
+  animation: emberRise1 1.2s ease-out infinite;
+}
+
+.animate-ember2 {
+  animation: emberRise2 1.5s ease-out infinite 0.4s;
+}
+
+.animate-ember3 {
+  animation: emberRise3 1.1s ease-out infinite 0.7s;
+}
+
+.animate-flame-halo {
+  animation: flameHaloPulse 0.9s ease-in-out infinite;
+}
+
+.animate-flame {
+  animation: flameLick1 0.42s ease-in-out infinite;
+}
+
+/* Magnetic Stirrer Vortex Whirlpool */
+@keyframes vortexSpin {
+  0% {
+    transform: rotate(0deg) scaleX(1);
+  }
+  50% {
+    transform: rotate(180deg) scaleX(0.95);
+  }
+  100% {
+    transform: rotate(360deg) scaleX(1);
+  }
+}
+
+.animate-vortex {
+  animation: vortexSpin 0.7s linear infinite;
+}
+
+/* Steam Rising from Heated Chamber */
+@keyframes steamRise {
+  0% {
+    transform: translateY(0) scale(0.6);
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.4;
+    transform: translateY(-40px) scale(1.2);
+  }
+  100% {
+    transform: translateY(-90px) scale(1.8);
+    opacity: 0;
+  }
+}
+
+.animate-steam {
+  animation: steamRise 1.6s ease-out infinite;
+}
+
+/* Burette Titration Drop Falling */
+@keyframes dropletFall {
+  0% {
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(120px) scaleY(1.4);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(130px) scaleY(0.4);
+    opacity: 0;
+  }
+}
+
+.animate-drop {
+  animation: dropletFall 0.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+/* Gas Spark POP Explosion */
+@keyframes sparkPop {
+  0% {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(2.2);
+    opacity: 0.9;
+    filter: brightness(2);
+  }
+  100% {
+    transform: scale(3.5);
+    opacity: 0;
+  }
+}
+
+.animate-spark-pop {
+  animation: sparkPop 0.4s ease-out forwards;
+}
+

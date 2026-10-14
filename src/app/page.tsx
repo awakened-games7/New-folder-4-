@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Navbar, { TabType } from "../components/layout/Navbar";
 import HeroAwakening from "../components/layout/HeroAwakening";
 import StatusScreen from "../components/status/StatusScreen";
-import BossRaidArena from "../components/arena/BossRaidArena";
+import VirtualAlchemyLab from "../components/arena/VirtualAlchemyLab";
 import ChemistryArchives from "../components/archives/ChemistryArchives";
 import GuildHub from "../components/guild/GuildHub";
 import AriseModal from "../components/layout/AriseModal";
@@ -19,7 +19,6 @@ import {
   ExternalLink,
   Gamepad2,
   Layers,
-  Flame,
   FlaskConical,
   Users,
   ChevronDown,
@@ -39,11 +38,16 @@ export default function Home() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("realms_hunter_profile");
-      if (saved) {
-        setUserProfile(JSON.parse(saved));
+      if (saved && saved.trim() !== "" && saved !== "undefined" && saved !== "null") {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === "object") {
+          setUserProfile(parsed);
+        }
       }
-    } catch (e) {
-      console.error("Error loading hunter profile:", e);
+    } catch {
+      try {
+        localStorage.removeItem("realms_hunter_profile");
+      } catch {}
     }
   }, []);
 
@@ -247,17 +251,17 @@ export default function Home() {
               <span>1. STATUS MATRIX</span>
             </button>
 
-            {/* Mode 2: Boss Arena */}
+            {/* Mode 2: Alchemy Lab */}
             <button
               onClick={() => handleTabSelect("arena", undefined, "arena-raid-view")}
               className={`px-3 py-1.5 rounded text-xs font-orbitron font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                 activeTab === "arena"
-                  ? "bg-rose-500 text-white border-2 border-rose-200 shadow-[0_0_15px_#ff285a] font-black"
-                  : "bg-black/80 text-rose-300 border border-rose-500/40 hover:border-rose-400 hover:bg-rose-950/40"
+                  ? "bg-emerald-500 text-black border-2 border-emerald-200 shadow-[0_0_15px_#10b981] font-black"
+                  : "bg-black/80 text-emerald-300 border border-emerald-500/40 hover:border-emerald-400 hover:bg-emerald-950/40"
               }`}
             >
-              <Flame className="w-3.5 h-3.5 animate-pulse" />
-              <span>2. BOSS ARENA</span>
+              <FlaskConical className="w-3.5 h-3.5 animate-pulse" />
+              <span>2. ALCHEMY LAB</span>
             </button>
 
             {/* Mode 3: Archives */}
@@ -316,7 +320,7 @@ export default function Home() {
 
           {activeTab === "arena" && (
             <div className="animate-fadeIn">
-              <BossRaidArena onTriggerArise={() => setIsAriseOpen(true)} />
+              <VirtualAlchemyLab />
             </div>
           )}
 
@@ -354,18 +358,18 @@ export default function Home() {
                 />
               </div>
 
-              {/* Section 2: Boss Arena */}
+              {/* Section 2: Virtual Alchemy Lab */}
               <div id="arena-section" className="space-y-4 scroll-mt-24 sm:scroll-mt-28">
-                <div className="flex items-center gap-2.5 sm:gap-3 border-b-2 border-rose-500 pb-2">
-                  <span className="px-2.5 py-1 bg-rose-500 text-white font-orbitron font-black text-[11px] sm:text-xs rounded shadow-[0_0_12px_#ff285a]">
+                <div className="flex items-center gap-2.5 sm:gap-3 border-b-2 border-emerald-500 pb-2">
+                  <span className="px-2.5 py-1 bg-emerald-500 text-black font-orbitron font-black text-[11px] sm:text-xs rounded shadow-[0_0_12px_#10b981]">
                     MODE 02
                   </span>
-                  <h2 className="text-lg sm:text-2xl font-orbitron font-black text-rose-200 tracking-wide flex items-center gap-2">
-                    <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-rose-400 animate-pulse shrink-0" />
-                    <span>PYQ BOSS RAID ARENA</span>
+                  <h2 className="text-lg sm:text-2xl font-orbitron font-black text-emerald-200 tracking-wide flex items-center gap-2">
+                    <FlaskConical className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 shrink-0" />
+                    <span>VIRTUAL ALCHEMY LAB</span>
                   </h2>
                 </div>
-                <BossRaidArena onTriggerArise={() => setIsAriseOpen(true)} />
+                <VirtualAlchemyLab />
               </div>
 
               {/* Section 3: Chemistry Archives */}
