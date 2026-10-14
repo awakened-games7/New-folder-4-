@@ -27,6 +27,7 @@ import {
   Gauge,
   Timer,
   Sliders,
+  Filter,
 } from "lucide-react";
 import { sounds } from "../audio/soundEffects";
 
@@ -35,6 +36,7 @@ import { sounds } from "../audio/soundEffects";
 // ─────────────────────────────────────────────────────────────
 
 type LabMode = "sandbox" | "flame_test" | "titration" | "salt_detective" | "periodic_matrix";
+type ReagentCategory = "all" | "salt" | "acid" | "base" | "organic" | "indicator";
 
 interface Reagent {
   id: string;
@@ -59,15 +61,15 @@ interface ReactionResult {
   precipitate?: string;
   precipitateColor?: string;
   gasEvolved?: string;
-  combustibleGas?: boolean; // Can be ignited with spark lighter
+  combustibleGas?: boolean;
   reactionType: string;
   deltaH: "Exothermic (ΔH < 0)" | "Endothermic (ΔH > 0)" | "Athermal (ΔH ≈ 0)";
-  tempShift: number; // In Celsius
+  tempShift: number;
   phResult: number;
   cbseNote: string;
   chapter: string;
   bubbles: boolean;
-  minTempRequired?: number; // Requires Bunsen burner heating
+  minTempRequired?: number;
 }
 
 interface FlameTestElement {
@@ -134,7 +136,7 @@ const REAGENTS: Reagent[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────
-// REACTION ENGINE DATABASE (25+ CBSE & Unreal Chemist reactions)
+// REACTION ENGINE DATABASE
 // ─────────────────────────────────────────────────────────────
 const REACTIONS: ReactionResult[] = [
   {
@@ -168,7 +170,7 @@ const REACTIONS: ReactionResult[] = [
     tempShift: 2.5,
     phResult: 1.2,
     cbseNote: "Confirmatory test for SO₄²⁻ anion. BaSO₄ is completely insoluble even in boiling concentrated mineral acids.",
-    chapter: "Qualitative Analysis & Solutions",
+    chapter: "Qualitative Salt Analysis",
     bubbles: false,
   },
   {
@@ -247,21 +249,6 @@ const REACTIONS: ReactionResult[] = [
     tempShift: 4.8,
     phResult: 7.0,
     cbseNote: "High-yield CBSE Board Question: Chloroform and Acetone show NEGATIVE deviation from Raoult's law (ΔH_mix < 0, ΔV_mix < 0) due to strong C-H···O=C hydrogen bonds.",
-    chapter: "Solutions (Ch 1)",
-    bubbles: false,
-  },
-  {
-    id: "ethanol_water",
-    reactants: ["ethanol", "water"],
-    equation: "C₂H₅OH + H₂O → Azeotropic Mixture",
-    balancedEquation: "C₂H₅OH(l) + H₂O(l) → Solution",
-    observation: "Miscible clear blend forms with slight thermal variation, demonstrating positive deviation at specific fractions.",
-    resultColor: "#e0f2fe",
-    reactionType: "Azeotrope Precursor / Raoult's Law",
-    deltaH: "Endothermic (ΔH > 0)",
-    tempShift: -1.2,
-    phResult: 7.0,
-    cbseNote: "Ethanol-water forms a minimum boiling azeotrope at 95.6% ethanol by volume (b.p. 351.15 K). Cannot be separated by fractional distillation.",
     chapter: "Solutions (Ch 1)",
     bubbles: false,
   },
@@ -349,7 +336,7 @@ const REACTIONS: ReactionResult[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────
-// FLAME TEST DATABASE (Unreal Chemist & CBSE Class 12 Qualitative)
+// FLAME TEST DATABASE
 // ─────────────────────────────────────────────────────────────
 const FLAME_ELEMENTS: FlameTestElement[] = [
   {
@@ -429,7 +416,7 @@ const FLAME_ELEMENTS: FlameTestElement[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────
-// PERIODIC TABLE QUICK MATRIX (16 Essential Elements)
+// PERIODIC TABLE QUICK MATRIX
 // ─────────────────────────────────────────────────────────────
 const PERIODIC_ELEMENTS: PeriodicElement[] = [
   { number: 1, symbol: "H", name: "Hydrogen", mass: "1.008", category: "Nonmetal", config: "1s¹", oxidationStates: "+1, -1", electronegativity: "2.20", cbseImportance: "H₂ evolution in metal-acid reactions, pop-sound confirmatory test." },
@@ -451,12 +438,12 @@ const PERIODIC_ELEMENTS: PeriodicElement[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────
-// REALISTIC ORGANIC RED FLAME COMPONENT (Unreal Chemist Physics)
+// 3D REALISTIC ORGANIC RED FLAME
 // ─────────────────────────────────────────────────────────────
 interface RealisticFlameProps {
   size?: "sm" | "md" | "lg";
-  intensity?: number; // 0 = off, 1 = low, 2 = med, 3 = max
-  overrideColor?: string; // custom salt emission color if dipped
+  intensity?: number;
+  overrideColor?: string;
   showEmbers?: boolean;
 }
 
@@ -468,15 +455,15 @@ const RealisticFlame: React.FC<RealisticFlameProps> = ({
 }) => {
   if (intensity === 0) return null;
 
-  const heightClass = size === "sm" ? "h-16 w-12" : size === "lg" ? "h-48 w-32" : "h-28 w-20";
+  const heightClass = size === "sm" ? "h-14 w-10" : size === "lg" ? "h-44 w-28" : "h-24 w-16";
   const scale = intensity === 1 ? "scale-75" : intensity === 2 ? "scale-100" : "scale-125";
   const isCustomColor = Boolean(overrideColor);
 
   return (
-    <div className={`relative flex flex-col items-center justify-end ${heightClass} ${scale} transition-all duration-300 pointer-events-none select-none my-1`}>
-      {/* 1. Deep Ambient Fiery Red Light Halo */}
+    <div className={`relative flex flex-col items-center justify-end ${heightClass} ${scale} transition-all duration-300 pointer-events-none select-none my-0.5`}>
+      {/* 1. Deep Ambient Fiery Halo */}
       <div
-        className="absolute bottom-0 w-36 h-36 rounded-full animate-flame-halo blur-2xl pointer-events-none -z-10"
+        className="absolute bottom-0 w-32 h-32 rounded-full animate-flame-halo blur-2xl pointer-events-none -z-10"
         style={{
           backgroundColor: isCustomColor ? overrideColor : "#ef4444",
           opacity: intensity === 3 ? 0.75 : intensity === 2 ? 0.55 : 0.35,
@@ -485,7 +472,7 @@ const RealisticFlame: React.FC<RealisticFlameProps> = ({
 
       {/* 2. Floating Fire Embers & Dancing Sparks */}
       {showEmbers && intensity >= 2 && (
-        <div className="absolute inset-0 flex justify-center pointer-events-none overflow-visible -top-8">
+        <div className="absolute inset-0 flex justify-center pointer-events-none overflow-visible -top-6">
           <div className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-ember1 shadow-[0_0_8px_#f59e0b]" />
           <div className="w-1 h-1 rounded-full bg-red-500 animate-ember2 shadow-[0_0_6px_#ef4444]" />
           <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-ember3 shadow-[0_0_8px_#ea580c]" />
@@ -493,7 +480,7 @@ const RealisticFlame: React.FC<RealisticFlameProps> = ({
         </div>
       )}
 
-      {/* 3. Outer Roaring Red Fire Mantle (Licking Flame Tongue 1) */}
+      {/* 3. Outer Roaring Red Fire Tongue (Back Layer) */}
       <div
         className="absolute bottom-0 w-full h-full rounded-t-full animate-flame-lick1 opacity-90 blur-[1px]"
         style={{
@@ -506,7 +493,7 @@ const RealisticFlame: React.FC<RealisticFlameProps> = ({
         }}
       />
 
-      {/* 4. Secondary Asynchronous Blazing Fire Tongue (Licking Flame Tongue 2) */}
+      {/* 4. Secondary Asynchronous Blazing Fire Tongue */}
       <div
         className="absolute bottom-0 w-[82%] h-[84%] rounded-t-full animate-flame-lick2 opacity-95 blur-[0.5px]"
         style={{
@@ -528,29 +515,200 @@ const RealisticFlame: React.FC<RealisticFlameProps> = ({
         }}
       />
 
-      {/* 6. Burner Gas Throat Combustion Anchor */}
+      {/* 6. Burner Combustion Base Anchor */}
       <div className="absolute bottom-0 w-[42%] h-[14%] rounded-b-md bg-gradient-to-t from-red-800/80 via-red-600/70 to-transparent blur-[0.5px]" />
     </div>
   );
 };
 
-export default function VirtualAlchemyLab() {
-  // Navigation & Subsystem Mode
-  const [activeMode, setActiveMode] = useState<LabMode>("sandbox");
+// ─────────────────────────────────────────────────────────────
+// 3D REALISTIC METALLIC BUNSEN BURNER COMPONENT
+// ─────────────────────────────────────────────────────────────
+interface BunsenBurner3DProps {
+  heatLevel: number;
+  size?: "sm" | "md";
+}
 
-  // Chamber State
+const BunsenBurner3D: React.FC<BunsenBurner3DProps> = ({ heatLevel, size = "md" }) => {
+  const isSmall = size === "sm";
+
+  return (
+    <div className="relative flex flex-col items-center justify-end select-none">
+      {/* Mounted Realistic Flame */}
+      {heatLevel > 0 && (
+        <div className="relative -mb-1 z-20">
+          <RealisticFlame size={isSmall ? "sm" : "md"} intensity={heatLevel} showEmbers={true} />
+        </div>
+      )}
+
+      {/* 3D Chrome Orifice Lip */}
+      <div className={`${isSmall ? "w-8 h-1.5" : "w-10 h-2"} rounded-full bg-gradient-to-r from-slate-400 via-white to-slate-500 shadow-sm z-10 border-t border-white/60`} />
+
+      {/* 3D Chrome Chimney Cylinder Barrel */}
+      <div className={`${isSmall ? "w-6 h-10" : "w-8 h-14"} burner-3d-barrel relative flex flex-col justify-between py-1 rounded-t-sm z-10`}>
+        {/* Specular White Vertical Highlight Line */}
+        <div className="absolute left-2 top-0 bottom-0 w-1 bg-white/40 blur-[0.5px] pointer-events-none" />
+      </div>
+
+      {/* 3D Brass Air Collar with Vent Holes */}
+      <div className={`${isSmall ? "w-7 h-3.5" : "w-9 h-4"} burner-3d-brass-collar rounded relative flex items-center justify-around px-1 z-10`}>
+        <div className="w-1.5 h-1.5 rounded-full bg-slate-950 border border-black/40 shadow-inner" />
+        <div className="w-1.5 h-1.5 rounded-full bg-slate-950 border border-black/40 shadow-inner" />
+        <div className="w-1.5 h-1.5 rounded-full bg-slate-950 border border-black/40 shadow-inner" />
+      </div>
+
+      {/* 3D Threaded Collar Base */}
+      <div className={`${isSmall ? "w-5 h-2" : "w-6 h-2.5"} bg-gradient-to-r from-slate-700 via-slate-400 to-slate-800 border-x border-slate-600 z-10`} />
+
+      {/* Gas Feed Tube Extending Horizontally */}
+      <div className="absolute bottom-2 -right-6 flex items-center z-0 pointer-events-none">
+        <div className="w-6 h-2 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-700 rounded-r border border-amber-800 shadow" />
+        <div className="w-2 h-2.5 rounded-r bg-slate-800 border border-slate-600" />
+      </div>
+
+      {/* 3D Cast Iron Heavy Base Pedestal */}
+      <div className={`${isSmall ? "w-24 h-4" : "w-28 h-5"} burner-3d-base rounded-full relative z-10 flex flex-col items-center justify-center`}>
+        {/* Chamfered Inner Rim */}
+        <div className="w-[85%] h-1 rounded-full bg-gradient-to-r from-slate-600 via-slate-300 to-slate-700 opacity-60" />
+      </div>
+
+      {/* Ground Depth Shadow */}
+      <div className={`${isSmall ? "w-28" : "w-32"} h-2 rounded-full bg-black/80 blur-[2px] mt-0.5`} />
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────
+// 3D REALISTIC GLASS BEAKER WITH FLUID MENISCUS & REFRACTIONS
+// ─────────────────────────────────────────────────────────────
+interface Beaker3DProps {
+  currentVolume: number; // 0 to 100
+  chamberColor: string;
+  activeReaction: ReactionResult | null;
+  stirrerRPM: number;
+  size?: "compact" | "full";
+}
+
+const Beaker3D: React.FC<Beaker3DProps> = ({
+  currentVolume,
+  chamberColor,
+  activeReaction,
+  stirrerRPM,
+  size = "full",
+}) => {
+  const isCompact = size === "compact";
+  const beakerWidth = isCompact ? "w-36 h-48" : "w-44 h-60";
+
+  return (
+    <div className={`relative ${beakerWidth} flex flex-col justify-end select-none`}>
+      {/* 3D Glass Beaded Lip Rim */}
+      <div className="absolute top-0 left-0 right-0 h-3 rounded-t-xl glass-3d-rim z-20 flex items-center justify-between px-2">
+        {/* Beaker Spout Notch */}
+        <div className="w-3 h-1.5 -ml-1 rounded-tl-full bg-white/70" />
+        <div className="w-2 h-1 bg-white/40 rounded-full" />
+      </div>
+
+      {/* 3D Glass Cylindrical Body */}
+      <div className="relative w-full h-[95%] glass-3d-cylinder rounded-b-2xl overflow-hidden flex flex-col justify-end">
+        {/* Specular Left Glare Reflection Highlight */}
+        <div className="absolute left-2 top-0 bottom-0 w-2 bg-gradient-to-r from-white/40 via-white/10 to-transparent pointer-events-none z-20" />
+        {/* Specular Right Diffuse Bounce Highlight */}
+        <div className="absolute right-2 top-0 bottom-0 w-1.5 bg-gradient-to-l from-white/20 to-transparent pointer-events-none z-20" />
+
+        {/* Graduated Volumetric Enamel Markings */}
+        <div className="absolute left-3 top-3 bottom-3 flex flex-col justify-between text-[9px] font-mono text-white/70 pointer-events-none z-20 font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span>- 100mL</span>
+          <span>- 75mL</span>
+          <span>- 50mL</span>
+          <span>- 25mL</span>
+        </div>
+
+        {/* 3D LIQUID VOLUME WITH MENISCUS */}
+        <div
+          className="w-full relative transition-all duration-700 ease-out flex flex-col justify-start"
+          style={{
+            height: `${Math.max(currentVolume, 0)}%`,
+            opacity: currentVolume > 0 ? 0.92 : 0,
+          }}
+        >
+          {/* Top Elliptical Liquid Surface Meniscus */}
+          {currentVolume > 2 && (
+            <div
+              className="absolute -top-2 left-0 right-0 h-4 liquid-3d-meniscus z-15 border-t border-white/40"
+              style={{
+                backgroundColor: chamberColor !== "transparent" ? chamberColor : "rgba(56, 189, 248, 0.6)",
+                boxShadow: "inset 0 1px 3px rgba(255, 255, 255, 0.6)",
+              }}
+            />
+          )}
+
+          {/* Liquid Core Body Gradient */}
+          <div
+            className="w-full h-full relative overflow-hidden"
+            style={{
+              background: `linear-gradient(90deg, rgba(0,0,0,0.3) 0%, ${chamberColor !== "transparent" ? chamberColor : "rgba(30, 41, 59, 0.7)"} 30%, ${chamberColor !== "transparent" ? chamberColor : "rgba(30, 41, 59, 0.7)"} 70%, rgba(0,0,0,0.2) 100%)`,
+            }}
+          >
+            {/* Magnetic Stirrer Vortex */}
+            {stirrerRPM > 0 && currentVolume > 15 && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-16 h-16 border-t-2 border-b-2 border-white/50 rounded-full animate-vortex blur-[0.5px]" />
+              </div>
+            )}
+
+            {/* Gas Bubbles FX */}
+            {activeReaction?.bubbles && (
+              <div className="absolute inset-0 flex justify-around pointer-events-none overflow-hidden">
+                <div className="w-2 h-2 rounded-full bg-white/70 animate-bubble shadow-sm" />
+                <div className="w-3 h-3 rounded-full bg-white/60 animate-bubble delay-100" />
+                <div className="w-1.5 h-1.5 rounded-full bg-white/80 animate-bubble delay-200" />
+                <div className="w-2.5 h-2.5 rounded-full bg-white/70 animate-bubble delay-300" />
+              </div>
+            )}
+
+            {/* Precipitate Settling at Bottom */}
+            {activeReaction?.precipitate && (
+              <div
+                className="absolute bottom-0 w-full h-5 animate-precipitate-settle border-t border-white/50 shadow-md"
+                style={{ backgroundColor: activeReaction.precipitateColor || "#ffffff" }}
+              />
+            )}
+
+            {/* 3D PTFE Magnetic Stir Bar */}
+            <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-15">
+              <div
+                className={`w-8 h-2.5 rounded-full bg-white border border-slate-300 shadow-[0_2px_4px_rgba(0,0,0,0.6)] ${
+                  stirrerRPM > 0 ? "animate-stirbar-3d" : ""
+                }`}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 3D Glass Bottom Thickness Curved Plate */}
+        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-t from-white/20 to-transparent border-t border-white/10 z-10" />
+      </div>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────
+// MAIN LAB CONTROLLER COMPONENT
+// ─────────────────────────────────────────────────────────────
+export default function VirtualAlchemyLab() {
+  const [activeMode, setActiveMode] = useState<LabMode>("sandbox");
   const [activeReagents, setActiveReagents] = useState<string[]>([]);
-  const [currentVolume, setCurrentVolume] = useState<number>(0); // 0 to 100 mL
-  const [doseAmount, setDoseAmount] = useState<number>(25); // 10, 25, 50 mL
-  const [temperature, setTemperature] = useState<number>(25); // Room temp 25°C
-  const [bunsenHeatLevel, setBunsenHeatLevel] = useState<number>(0); // 0 = off, 1 = low, 2 = medium, 3 = roaring
-  const [stirrerRPM, setStirrerRPM] = useState<number>(0); // 0, 400, 800, 1200
-  const [simSpeed, setSimSpeed] = useState<number>(1); // 0.5, 1, 2.5
+  const [currentVolume, setCurrentVolume] = useState<number>(0);
+  const [doseAmount, setDoseAmount] = useState<number>(25);
+  const [temperature, setTemperature] = useState<number>(25);
+  const [bunsenHeatLevel, setBunsenHeatLevel] = useState<number>(0);
+  const [stirrerRPM, setStirrerRPM] = useState<number>(0);
   const [isSparking, setIsSparking] = useState<boolean>(false);
   const [activeReaction, setActiveReaction] = useState<ReactionResult | null>(null);
   const [chamberColor, setChamberColor] = useState<string>("transparent");
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState<ReagentCategory>("all");
   const [reactionLog, setReactionLog] = useState<{ id: string; time: string; text: string; xp: number }[]>([
-    { id: "init", time: "00:00", text: "Virtual Alchemy Chamber initialized. Ready for Hunter experimentation.", xp: 0 },
+    { id: "init", time: "00:00", text: "3D Virtual Alchemy Chamber online. Ready for Hunter experimentation.", xp: 0 },
   ]);
 
   // Flame Test State
@@ -559,77 +717,59 @@ export default function VirtualAlchemyLab() {
   const [useCobaltGlass, setUseCobaltGlass] = useState<boolean>(false);
 
   // Titration State
-  const [buretteVolume, setBuretteVolume] = useState<number>(50.0); // 50 mL burette
+  const [buretteVolume, setBuretteVolume] = useState<number>(50.0);
   const [titrationDelivered, setTitrationDelivered] = useState<number>(0.0);
   const [titrantIndicator, setTitrantIndicator] = useState<"phenolphthalein" | "methyl_orange">("phenolphthalein");
   const [titrationPh, setTitrationPh] = useState<number>(1.0);
   const [isTitratingFlow, setIsTitratingFlow] = useState<boolean>(false);
   const titrationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Salt Detective Mystery Challenge State
-  const [mysterySalt, setMysterySalt] = useState<{ name: string; cation: string; anion: string; formula: string }>({
-    name: "Lead Nitrate",
-    cation: "Pb²⁺ (Lead)",
-    anion: "NO₃⁻ (Nitrate)",
-    formula: "Pb(NO₃)₂",
-  });
+  // Salt Detective State
   const [detectiveNotes, setDetectiveNotes] = useState<string[]>([]);
   const [selectedCationGuess, setSelectedCationGuess] = useState<string>("");
   const [selectedAnionGuess, setSelectedAnionGuess] = useState<string>("");
   const [detectiveResult, setDetectiveResult] = useState<string | null>(null);
 
-  // Periodic Table Selected Element
-  const [inspectedElement, setInspectedElement] = useState<PeriodicElement>(PERIODIC_ELEMENTS[4]); // Na by default
+  // Periodic Table
+  const [inspectedElement, setInspectedElement] = useState<PeriodicElement>(PERIODIC_ELEMENTS[4]);
 
-  // ─────────────────────────────────────────────────────────────
-  // REACTION EVALUATION ENGINE
-  // ─────────────────────────────────────────────────────────────
-  const evaluateReaction = useCallback(
-    (reagentIds: string[]) => {
-      // Find matching reactions
-      let match: ReactionResult | null = null;
-
-      for (const rxn of REACTIONS) {
-        const hasAll = rxn.reactants.every((r) => reagentIds.includes(r));
-        if (hasAll) {
-          match = rxn;
-          break;
-        }
+  // Evaluate Reaction
+  const evaluateReaction = useCallback((reagentIds: string[]) => {
+    let match: ReactionResult | null = null;
+    for (const rxn of REACTIONS) {
+      if (rxn.reactants.every((r) => reagentIds.includes(r))) {
+        match = rxn;
+        break;
       }
+    }
 
-      if (match) {
-        setActiveReaction(match);
-        setChamberColor(match.resultColor);
-        setTemperature((prev) => Math.min(prev + match!.tempShift, 100));
-        sounds.playReaction();
-        if (match.bubbles) sounds.playBubble();
+    if (match) {
+      setActiveReaction(match);
+      setChamberColor(match.resultColor);
+      setTemperature((prev) => Math.min(prev + match!.tempShift, 100));
+      sounds.playReaction();
+      if (match.bubbles) sounds.playBubble();
 
-        setReactionLog((prev) => [
-          {
-            id: Math.random().toString(),
-            time: new Date().toLocaleTimeString().slice(3, 8),
-            text: `[REACTION TRIGGERED]: ${match!.equation} (${match!.reactionType})`,
-            xp: 150,
-          },
-          ...prev.slice(0, 15),
-        ]);
+      setReactionLog((prev) => [
+        {
+          id: Math.random().toString(),
+          time: new Date().toLocaleTimeString().slice(3, 8),
+          text: `[REACTION TRIGGERED]: ${match!.equation} (${match!.reactionType})`,
+          xp: 150,
+        },
+        ...prev.slice(0, 15),
+      ]);
+    } else {
+      setActiveReaction(null);
+      if (reagentIds.length > 0) {
+        const lastReagent = REAGENTS.find((r) => r.id === reagentIds[reagentIds.length - 1]);
+        if (lastReagent) setChamberColor(lastReagent.color);
       } else {
-        // Simple physical blend
-        setActiveReaction(null);
-        if (reagentIds.length > 0) {
-          const lastReagent = REAGENTS.find((r) => r.id === reagentIds[reagentIds.length - 1]);
-          if (lastReagent) {
-            setChamberColor(lastReagent.color);
-          }
-        } else {
-          setChamberColor("transparent");
-        }
+        setChamberColor("transparent");
       }
-    },
-    []
-  );
+    }
+  }, []);
 
-  // Add Reagent Handler
   const handleAddReagent = (reagent: Reagent) => {
     sounds.playClick();
     if (currentVolume >= 100) {
@@ -651,14 +791,13 @@ export default function VirtualAlchemyLab() {
       {
         id: Math.random().toString(),
         time: new Date().toLocaleTimeString().slice(3, 8),
-        text: `Dosed +${doseAmount}mL ${reagent.name} [${reagent.formula}] into chamber.`,
+        text: `Dosed +${doseAmount}mL ${reagent.name} [${reagent.formula}].`,
         xp: 25,
       },
       ...prev.slice(0, 15),
     ]);
   };
 
-  // Purge Flask Handler
   const handlePurgeFlask = () => {
     sounds.playAlert();
     setActiveReagents([]);
@@ -679,7 +818,6 @@ export default function VirtualAlchemyLab() {
     ]);
   };
 
-  // Spark Gas Ignition Handler
   const handleSparkIgnite = () => {
     sounds.playFlame();
     setIsSparking(true);
@@ -709,38 +847,22 @@ export default function VirtualAlchemyLab() {
     }
   };
 
-  // Bunsen Burner Heat Adjust
   const handleBunsenToggle = () => {
     sounds.playFlame();
     const nextLevel = (bunsenHeatLevel + 1) % 4;
     setBunsenHeatLevel(nextLevel);
-
     const temps = [25, 95, 180, 420];
     setTemperature(temps[nextLevel]);
-
-    setReactionLog((prev) => [
-      {
-        id: Math.random().toString(),
-        time: new Date().toLocaleTimeString().slice(3, 8),
-        text: `Bunsen Burner set to: ${
-          nextLevel === 0 ? "OFF (25°C)" : nextLevel === 1 ? "Gentle Warmth (95°C)" : nextLevel === 2 ? "Oxidizing Flame (180°C)" : "Roaring Blue Blast (420°C)"
-        }`,
-        xp: 15,
-      },
-      ...prev.slice(0, 15),
-    ]);
   };
 
-  // Magnetic Stirrer Toggle
   const handleStirrerToggle = () => {
     sounds.playClick();
     const rpms = [0, 400, 800, 1200];
     const currentIndex = rpms.indexOf(stirrerRPM);
-    const nextRPM = rpms[(currentIndex + 1) % rpms.length];
-    setStirrerRPM(nextRPM);
+    setStirrerRPM(rpms[(currentIndex + 1) % rpms.length]);
   };
 
-  // Titration Flow Loop
+  // Titration Loop
   const handleToggleTitrationFlow = () => {
     sounds.playClick();
     if (isTitratingFlow) {
@@ -761,34 +883,28 @@ export default function VirtualAlchemyLab() {
 
         setTitrationDelivered((prev) => {
           const nextDelivered = +(prev + 0.5).toFixed(1);
-
-          // Calculate pH curve: neutralization endpoint at 20.0 mL delivered
           if (nextDelivered < 18.0) {
             setTitrationPh(+(1.0 + (nextDelivered / 20.0) * 1.5).toFixed(2));
           } else if (nextDelivered >= 18.0 && nextDelivered < 20.0) {
             setTitrationPh(+(2.5 + ((nextDelivered - 18) / 2.0) * 4.5).toFixed(2));
           } else if (nextDelivered >= 20.0 && nextDelivered <= 20.5) {
-            // Equivalence sharp surge
             setTitrationPh(8.5);
             sounds.playLevelUp();
           } else {
             setTitrationPh(+(10.5 + Math.min(2.0, (nextDelivered - 20) * 0.1)).toFixed(2));
           }
-
           return nextDelivered;
         });
       }, 300);
     }
   };
 
-  // Clean titration interval on unmount
   useEffect(() => {
     return () => {
       if (titrationIntervalRef.current) clearInterval(titrationIntervalRef.current);
     };
   }, []);
 
-  // Reset Titration
   const handleResetTitration = () => {
     sounds.playAlert();
     if (titrationIntervalRef.current) clearInterval(titrationIntervalRef.current);
@@ -798,59 +914,32 @@ export default function VirtualAlchemyLab() {
     setTitrationPh(1.0);
   };
 
-  // Salt Detective Test Execution
-  const runDetectiveTest = (testType: string) => {
-    sounds.playClick();
-    let note = "";
-    if (testType === "flame") {
-      note = "Flame Test: Produced a pale livid-blue/greyish flame on platinum wire.";
-    } else if (testType === "dil_acid") {
-      note = "Dilute H₂SO₄: No brisk effervescence observed (Carbonate, Sulfite absent).";
-    } else if (testType === "conc_acid") {
-      note = "Conc. H₂SO₄: Brown fumes of NO₂ evolved upon heating with copper turnings (Nitrate suspected!).";
-    } else if (testType === "ki_confirm") {
-      note = "KI Solution Added: Brilliant golden yellow precipitate of PbI₂ formed instantly (Lead Pb²⁺ confirmed!).";
-    } else if (testType === "brown_ring") {
-      note = "Brown Ring Test: Distinct brown ring formed at junction of FeSO₄ and conc. H₂SO₄ (Nitrate NO₃⁻ confirmed!).";
-    }
+  // Filtered reagents for easy access
+  const filteredReagents = REAGENTS.filter((r) => {
+    if (activeCategoryFilter === "all") return true;
+    return r.category === activeCategoryFilter;
+  });
 
-    if (!detectiveNotes.includes(note)) {
-      setDetectiveNotes((prev) => [...prev, note]);
-    }
-  };
-
-  // Submit Detective Guess
-  const handleDetectiveSubmit = () => {
-    if (selectedCationGuess === "Lead (Pb²⁺)" && selectedAnionGuess === "Nitrate (NO₃⁻)") {
-      sounds.playLevelUp();
-      setDetectiveResult("CORRECT! You identified Lead(II) Nitrate Pb(NO₃)₂. +500 Hunter Chemistry XP Awarded!");
-    } else {
-      sounds.playAlert();
-      setDetectiveResult("INCORRECT ANALYSIS. Re-examine the confirmatory tests and qualitative flow chart.");
-    }
-  };
-
-  // Dynamic pH Calculation for Chamber
   const calculatedPh = activeReaction ? activeReaction.phResult : activeReagents.length > 0 ? 7.0 : 7.0;
 
   return (
-    <section id="arena-raid-view" className="relative w-full py-8 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="arena-raid-view" className="relative w-full py-6 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* ── HEADER TITLE & BADGE ── */}
-      <div className="relative mb-6 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono tracking-widest uppercase mb-2 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+      <div className="relative mb-5 text-center">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono tracking-widest uppercase mb-1.5 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
           <FlaskConical className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-          <span>UNREAL CHEMIST ENGINE • SIMULATION LAB</span>
+          <span>3D UNREAL CHEMIST ENGINE • LEGENDARY TIER</span>
         </div>
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white uppercase drop-shadow-[0_0_25px_rgba(0,255,221,0.3)]">
+        <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white uppercase drop-shadow-[0_0_25px_rgba(0,255,221,0.3)]">
           VIRTUAL <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">ALCHEMY LAB</span>
         </h2>
-        <p className="mt-2 text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto font-mono">
-          Interactive chemical apparatus sandbox featuring Bunsen heating, flame spectroscopy, dropwise titration, and CBSE Class 12 board qualitative analysis.
+        <p className="mt-1 text-xs text-slate-400 max-w-xl mx-auto font-mono">
+          Interactive 3D laboratory apparatus, realistic red fire burner, and dropwise titration simulator.
         </p>
       </div>
 
-      {/* ── SUB-MODE NAVIGATION TABS (5 Unreal Chemist Systems) ── */}
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-8 border-b border-slate-800/80 pb-4">
+      {/* ── SUB-MODE NAVIGATION TABS ── */}
+      <div className="flex items-center justify-start sm:justify-center gap-1.5 mb-6 overflow-x-auto pb-2 custom-scrollbar">
         {[
           { id: "sandbox", label: "REACTION CHAMBER", icon: FlaskConical, color: "text-emerald-400", border: "border-emerald-500" },
           { id: "flame_test", label: "FLAME SPECTROSCOPY", icon: Flame, color: "text-amber-400", border: "border-amber-500" },
@@ -867,13 +956,13 @@ export default function VirtualAlchemyLab() {
                 sounds.playClick();
                 setActiveMode(tab.id as LabMode);
               }}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg font-mono text-xs uppercase tracking-wider transition-all duration-200 border ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-xs uppercase tracking-wider whitespace-nowrap transition-all border shrink-0 ${
                 isActive
-                  ? `bg-slate-900 ${tab.border} ${tab.color} shadow-[0_0_15px_rgba(0,255,221,0.2)] font-bold`
+                  ? `bg-slate-900 ${tab.border} ${tab.color} shadow-[0_0_12px_rgba(0,255,221,0.25)] font-bold`
                   : "bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700"
               }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-3.5 h-3.5" />
               <span>{tab.label}</span>
             </button>
           );
@@ -881,240 +970,114 @@ export default function VirtualAlchemyLab() {
       </div>
 
       {/* ═════════════════════════════════════════════════════════════
-          MODE 1: REACTION CHAMBER (CORE UNREAL CHEMIST SANDBOX)
+          MODE 1: REACTION CHAMBER (ERGONOMIC MOBILE + 3D APPARATUS)
       ═════════════════════════════════════════════════════════════ */}
       {activeMode === "sandbox" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* LEFT: REAGENT VAULT (5 cols) */}
-          <div className="lg:col-span-5 flex flex-col gap-4">
-            <div className="solo-window p-4 rounded-xl border border-slate-800 bg-[#0A0D14]/90 backdrop-blur-md">
-              <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-                <div className="flex items-center gap-2 text-white font-mono text-xs uppercase font-bold tracking-wider">
-                  <Layers className="w-4 h-4 text-emerald-400" />
-                  <span>CHEMICAL REAGENT VAULT</span>
-                </div>
-                {/* Dosage volume pills */}
-                <div className="flex items-center gap-1 bg-slate-900 p-0.5 rounded border border-slate-700">
-                  {[10, 25, 50].map((vol) => (
-                    <button
-                      key={vol}
-                      onClick={() => {
-                        sounds.playClick();
-                        setDoseAmount(vol);
-                      }}
-                      className={`px-2 py-0.5 text-[10px] font-mono rounded ${
-                        doseAmount === vol ? "bg-emerald-500 text-black font-bold" : "text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      +{vol}mL
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Scrollable grid of chemicals */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[460px] overflow-y-auto custom-scrollbar pr-1">
-                {REAGENTS.map((reagent) => {
-                  const isPresent = activeReagents.includes(reagent.id);
-                  return (
-                    <button
-                      key={reagent.id}
-                      onClick={() => handleAddReagent(reagent)}
-                      className={`p-2 rounded-lg border text-left transition-all duration-150 flex flex-col justify-between h-[82px] relative overflow-hidden group ${
-                        isPresent
-                          ? "border-emerald-400 bg-emerald-950/40 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
-                          : `border-slate-800 bg-gradient-to-br ${reagent.bgGradient} hover:border-slate-600`
-                      }`}
-                    >
-                      <div className="flex items-center justify-between w-full">
-                        <span className="text-[10px] font-mono text-slate-400 uppercase">{reagent.category}</span>
-                        <div
-                          className="w-2.5 h-2.5 rounded-full border border-white/30"
-                          style={{ backgroundColor: reagent.color }}
-                        />
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold text-white truncate group-hover:text-emerald-300">
-                          {reagent.name}
-                        </div>
-                        <div className="text-[10px] font-mono text-emerald-400 truncate">{reagent.formula}</div>
-                      </div>
-                      {/* Dosing indicator */}
-                      <div className="absolute right-1 bottom-1 opacity-0 group-hover:opacity-100 transition-opacity text-[9px] text-emerald-400 font-mono">
-                        +{doseAmount}mL
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* CHAMBER CONTROLS & APPARATUS (Bunsen, Stirrer, pH, Spark) */}
-            <div className="solo-window p-4 rounded-xl border border-slate-800 bg-[#0A0D14]/90 flex flex-col gap-3 font-mono text-xs">
-              <div className="text-slate-400 uppercase text-[11px] font-bold flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-white">
-                  <Sliders className="w-3.5 h-3.5 text-cyan-400" /> APPARATUS CONTROL PANEL
-                </span>
-                <span className="text-slate-500">SPEED: {simSpeed}x</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                {/* Bunsen Burner Button */}
-                <button
-                  onClick={handleBunsenToggle}
-                  className={`p-2.5 rounded-lg border flex items-center gap-2 transition-all ${
-                    bunsenHeatLevel > 0
-                      ? "border-amber-500 bg-amber-950/40 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.3)] font-bold"
-                      : "border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700"
-                  }`}
-                >
-                  <Flame className={`w-4 h-4 ${bunsenHeatLevel > 0 ? "text-amber-400 animate-flame" : ""}`} />
-                  <div className="text-left">
-                    <div className="text-[10px] text-slate-400">BUNSEN HEATER</div>
-                    <div className="text-xs">{bunsenHeatLevel === 0 ? "OFF" : bunsenHeatLevel === 1 ? "LOW (95°C)" : bunsenHeatLevel === 2 ? "MED (180°C)" : "MAX (420°C)"}</div>
-                  </div>
-                </button>
-
-                {/* Magnetic Stirrer */}
-                <button
-                  onClick={handleStirrerToggle}
-                  className={`p-2.5 rounded-lg border flex items-center gap-2 transition-all ${
-                    stirrerRPM > 0
-                      ? "border-cyan-500 bg-cyan-950/40 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.3)] font-bold"
-                      : "border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700"
-                  }`}
-                >
-                  <RotateCcw className={`w-4 h-4 ${stirrerRPM > 0 ? "text-cyan-400 animate-spin" : ""}`} />
-                  <div className="text-left">
-                    <div className="text-[10px] text-slate-400">MAGNETIC STIRRER</div>
-                    <div className="text-xs">{stirrerRPM === 0 ? "OFF" : `${stirrerRPM} RPM`}</div>
-                  </div>
-                </button>
-
-                {/* Spark Igniter */}
-                <button
-                  onClick={handleSparkIgnite}
-                  className="p-2.5 rounded-lg border border-red-500/40 bg-red-950/30 text-red-300 hover:border-red-400 hover:bg-red-900/40 flex items-center gap-2 transition-all"
-                >
-                  <Zap className="w-4 h-4 text-red-400" />
-                  <div className="text-left">
-                    <div className="text-[10px] text-red-400">GAS SPARK GUN</div>
-                    <div className="text-xs">IGNITE HEADSPACE</div>
-                  </div>
-                </button>
-
-                {/* PURGE FLASK */}
-                <button
-                  onClick={handlePurgeFlask}
-                  className="p-2.5 rounded-lg border border-slate-700 bg-slate-900 text-slate-300 hover:border-emerald-500 hover:text-emerald-400 flex items-center gap-2 transition-all"
-                >
-                  <RotateCcw className="w-4 h-4 text-emerald-400" />
-                  <div className="text-left">
-                    <div className="text-[10px] text-slate-400">CLEAN DECONTAMINATE</div>
-                    <div className="text-xs font-bold text-emerald-400">PURGE FLASK</div>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT: VIRTUAL FLASK CHAMBER & TELEMETRY (7 cols) */}
-          <div className="lg:col-span-7 flex flex-col gap-4">
-            {/* FLASK VISUAL APPARATUS */}
-            <div className="solo-window p-6 rounded-xl border border-slate-800 bg-[#0A0D14]/95 flex flex-col items-center justify-center relative min-h-[380px] overflow-hidden">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-5">
+          {/* 
+            MOBILE FIRST: ON SCREENS < 1024px, SHOW THE 3D APPARATUS AT TOP!
+            No more scrolling/sliding 500px down to see the flask!
+          */}
+          <div className="order-1 lg:order-2 lg:col-span-7 flex flex-col gap-4">
+            {/* 3D CHAMBER VIEWPORT FRAME */}
+            <div className="solo-window p-4 sm:p-6 rounded-2xl border border-slate-800 bg-[#0A0D14]/95 backdrop-blur-md flex flex-col items-center justify-center relative min-h-[340px] sm:min-h-[400px] overflow-hidden shadow-[0_10px_35px_rgba(0,0,0,0.8)]">
               {/* Headspace Spark Shockwave */}
               {isSparking && (
-                <div className="absolute top-12 w-24 h-24 rounded-full bg-amber-400/40 animate-spark-pop pointer-events-none z-30 blur-sm" />
+                <div className="absolute top-10 w-24 h-24 rounded-full bg-amber-400/40 animate-spark-pop pointer-events-none z-30 blur-sm" />
               )}
 
-              {/* Telemetry Status Badges */}
-              <div className="absolute top-3 left-3 right-3 flex items-center justify-between text-[11px] font-mono z-20">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300 flex items-center gap-1">
+              {/* HUD Telemetry Badges */}
+              <div className="absolute top-3 left-3 right-3 flex items-center justify-between text-[11px] font-mono z-30">
+                <div className="flex items-center gap-1.5">
+                  <span className="px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-700 text-slate-200 flex items-center gap-1 shadow">
                     <Thermometer className="w-3 h-3 text-red-400" /> {temperature.toFixed(1)}°C
                   </span>
-                  <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300 flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-700 text-slate-200 flex items-center gap-1 shadow">
                     <Gauge className="w-3 h-3 text-cyan-400" /> pH {calculatedPh.toFixed(1)}
                   </span>
                 </div>
-                <div className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-emerald-400 font-bold">
-                  VOL: {currentVolume} / 100 mL
+                <div className="px-2.5 py-0.5 rounded-md bg-slate-900/90 border border-slate-700 text-emerald-400 font-bold shadow">
+                  {currentVolume} / 100 mL
                 </div>
               </div>
 
               {/* Steam Rising FX when Heated */}
               {bunsenHeatLevel > 0 && currentVolume > 0 && (
-                <div className="absolute top-10 flex gap-4 pointer-events-none z-10">
+                <div className="absolute top-8 flex gap-4 pointer-events-none z-25">
                   <div className="w-6 h-12 bg-white/10 rounded-full animate-steam blur-md" />
                   <div className="w-8 h-16 bg-white/15 rounded-full animate-steam blur-lg delay-150" />
                   <div className="w-5 h-10 bg-white/10 rounded-full animate-steam blur-md delay-300" />
                 </div>
               )}
 
-              {/* BEAKER / FLASK CONTAINER */}
-              <div className="relative w-48 h-64 border-b-4 border-l-4 border-r-4 border-slate-600/80 rounded-b-3xl bg-slate-950/40 backdrop-blur-sm shadow-[inset_0_0_25px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col justify-end mt-4">
-                {/* Beaker volumetric graduation marks */}
-                <div className="absolute left-2 top-0 bottom-0 flex flex-col justify-between py-4 text-[9px] font-mono text-slate-500 pointer-events-none select-none z-10">
-                  <span>- 100mL</span>
-                  <span>- 75mL</span>
-                  <span>- 50mL</span>
-                  <span>- 25mL</span>
-                </div>
+              {/* 3D APPARATUS STAGE: 3D BEAKER + 3D METALLIC BUNSEN BURNER */}
+              <div className="flex flex-col items-center justify-end z-20 mt-6">
+                {/* 3D Volumetric Beaker */}
+                <Beaker3D
+                  currentVolume={currentVolume}
+                  chamberColor={chamberColor}
+                  activeReaction={activeReaction}
+                  stirrerRPM={stirrerRPM}
+                  size="full"
+                />
 
-                {/* LIQUID LEVEL */}
-                <div
-                  className="w-full transition-all duration-700 ease-out relative flex items-center justify-center"
-                  style={{
-                    height: `${currentVolume}%`,
-                    backgroundColor: chamberColor !== "transparent" ? chamberColor : "rgba(30, 41, 59, 0.4)",
-                    opacity: currentVolume > 0 ? 0.85 : 0,
-                  }}
-                >
-                  {/* Magnetic Stirrer Vortex */}
-                  {stirrerRPM > 0 && currentVolume > 20 && (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="w-20 h-20 border-t-2 border-b-2 border-white/40 rounded-full animate-vortex" />
-                    </div>
-                  )}
-
-                  {/* Gas Bubbles FX */}
-                  {activeReaction?.bubbles && (
-                    <div className="absolute inset-0 flex justify-around pointer-events-none overflow-hidden">
-                      <div className="w-2 h-2 rounded-full bg-white/60 animate-bubble" />
-                      <div className="w-3 h-3 rounded-full bg-white/50 animate-bubble delay-100" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-white/70 animate-bubble delay-200" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-white/60 animate-bubble delay-300" />
-                    </div>
-                  )}
-
-                  {/* Precipitate settling at bottom */}
-                  {activeReaction?.precipitate && (
-                    <div
-                      className="absolute bottom-0 w-full h-4 animate-precipitate-settle border-t border-white/40"
-                      style={{ backgroundColor: activeReaction.precipitateColor || "#ffffff" }}
-                    />
-                  )}
+                {/* 3D Metallic Bunsen Burner with Organic Red Flame */}
+                <div className="mt-2">
+                  <BunsenBurner3D heatLevel={bunsenHeatLevel} size="md" />
                 </div>
               </div>
 
-              {/* REALISTIC BUNSEN BURNER RED FLAME BASE */}
-              <div className="flex flex-col items-center mt-1 z-10">
-                {bunsenHeatLevel > 0 ? (
-                  <RealisticFlame
-                    size="sm"
-                    intensity={bunsenHeatLevel}
-                    showEmbers={true}
-                  />
-                ) : (
-                  <div className="w-16 h-2 bg-slate-800 rounded-full" />
-                )}
-                <div className="w-20 h-3 bg-slate-900 border border-slate-700 rounded-t" />
+              {/* QUICK ONE-TOUCH MOBILE APPARATUS CONTROLS (DOCK BAR) */}
+              <div className="w-full mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-1.5 font-mono text-[10px] sm:text-xs z-30">
+                {/* Heater Toggle */}
+                <button
+                  onClick={handleBunsenToggle}
+                  className={`flex-1 py-1.5 px-2 rounded-lg border flex items-center justify-center gap-1 transition-all ${
+                    bunsenHeatLevel > 0
+                      ? "border-red-500 bg-red-950/50 text-red-300 font-bold shadow-[0_0_12px_rgba(239,68,68,0.3)]"
+                      : "border-slate-800 bg-slate-900/80 text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Flame className={`w-3.5 h-3.5 ${bunsenHeatLevel > 0 ? "text-red-400 animate-flame" : ""}`} />
+                  <span>{bunsenHeatLevel === 0 ? "FLAME: OFF" : `HEAT: L${bunsenHeatLevel}`}</span>
+                </button>
+
+                {/* Stirrer Toggle */}
+                <button
+                  onClick={handleStirrerToggle}
+                  className={`flex-1 py-1.5 px-2 rounded-lg border flex items-center justify-center gap-1 transition-all ${
+                    stirrerRPM > 0
+                      ? "border-cyan-500 bg-cyan-950/50 text-cyan-300 font-bold shadow-[0_0_12px_rgba(6,182,212,0.3)]"
+                      : "border-slate-800 bg-slate-900/80 text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <RotateCcw className={`w-3.5 h-3.5 ${stirrerRPM > 0 ? "text-cyan-400 animate-spin" : ""}`} />
+                  <span>{stirrerRPM === 0 ? "STIR: OFF" : `${stirrerRPM} RPM`}</span>
+                </button>
+
+                {/* Gas Spark Gun */}
+                <button
+                  onClick={handleSparkIgnite}
+                  className="py-1.5 px-2.5 rounded-lg border border-red-500/50 bg-red-950/40 text-red-300 hover:bg-red-900/40 flex items-center gap-1 transition-all"
+                >
+                  <Zap className="w-3.5 h-3.5 text-red-400" />
+                  <span className="hidden sm:inline">SPARK</span>
+                </button>
+
+                {/* Purge Flask */}
+                <button
+                  onClick={handlePurgeFlask}
+                  className="py-1.5 px-3 rounded-lg border border-slate-700 bg-slate-900 text-slate-200 hover:border-emerald-500 hover:text-emerald-400 flex items-center gap-1 transition-all font-bold"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>PURGE</span>
+                </button>
               </div>
             </div>
 
-            {/* REACTION INTEL & CBSE CLASS 12 BREAKDOWN */}
+            {/* LIVE REACTION INTEL & CBSE CLASS 12 BREAKDOWN */}
             {activeReaction ? (
-              <div className="solo-window p-4 rounded-xl border border-emerald-500/40 bg-emerald-950/20 backdrop-blur-md flex flex-col gap-2 font-mono">
+              <div className="solo-window p-3.5 sm:p-4 rounded-xl border border-emerald-500/40 bg-emerald-950/20 backdrop-blur-md flex flex-col gap-2 font-mono">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" /> {activeReaction.reactionType}
@@ -1124,7 +1087,7 @@ export default function VirtualAlchemyLab() {
                   </span>
                 </div>
 
-                <div className="text-sm font-bold text-white tracking-wide bg-slate-900/90 p-2 rounded border border-slate-800">
+                <div className="text-xs sm:text-sm font-bold text-white tracking-wide bg-slate-900/90 p-2 rounded border border-slate-800 break-words">
                   {activeReaction.balancedEquation}
                 </div>
 
@@ -1134,8 +1097,8 @@ export default function VirtualAlchemyLab() {
                 </div>
 
                 {activeReaction.precipitate && (
-                  <div className="text-xs text-amber-300 flex items-center gap-1">
-                    <AlertTriangle className="w-3.5 h-3.5" />
+                  <div className="text-xs text-amber-300 flex items-center gap-1 font-bold">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
                     <span>Precipitate: {activeReaction.precipitate}</span>
                   </div>
                 )}
@@ -1147,17 +1110,106 @@ export default function VirtualAlchemyLab() {
                   {activeReaction.cbseNote}
                 </div>
               </div>
-            ) : (
-              <div className="solo-window p-4 rounded-xl border border-slate-800 bg-[#0A0D14]/80 text-center py-6 text-slate-500 font-mono text-xs">
-                Select reagents from the vault above (e.g. NaCl + AgNO₃ or Phenol + FeCl₃) to trigger reactions and precipitate crystallization.
+            ) : null}
+          </div>
+
+          {/* 
+            REAGENT VAULT: DIRECTLY ACCESSIBLE WITH 1-TAP CATEGORIES
+            On mobile, sits right underneath the flask so students can tap reagents and instantly see the flask!
+          */}
+          <div className="order-2 lg:order-1 lg:col-span-5 flex flex-col gap-3 font-mono">
+            <div className="solo-window p-3.5 sm:p-4 rounded-xl border border-slate-800 bg-[#0A0D14]/90 backdrop-blur-md">
+              <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-800">
+                <div className="flex items-center gap-2 text-white text-xs uppercase font-bold tracking-wider">
+                  <Layers className="w-4 h-4 text-emerald-400" />
+                  <span>CHEMICAL VAULT</span>
+                </div>
+                {/* Dosage volume pills */}
+                <div className="flex items-center gap-1 bg-slate-900 p-0.5 rounded border border-slate-700">
+                  {[10, 25, 50].map((vol) => (
+                    <button
+                      key={vol}
+                      onClick={() => {
+                        sounds.playClick();
+                        setDoseAmount(vol);
+                      }}
+                      className={`px-2 py-0.5 text-[10px] rounded ${
+                        doseAmount === vol ? "bg-emerald-500 text-black font-bold" : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      +{vol}mL
+                    </button>
+                  ))}
+                </div>
               </div>
-            )}
+
+              {/* Quick Filter Category Pills (All, Salts, Acids, Bases, Organics) */}
+              <div className="flex items-center gap-1 mb-2.5 overflow-x-auto pb-1 text-[10px] custom-scrollbar">
+                {[
+                  { id: "all", label: "ALL" },
+                  { id: "salt", label: "SALTS" },
+                  { id: "acid", label: "ACIDS" },
+                  { id: "base", label: "BASES" },
+                  { id: "organic", label: "ORGANICS" },
+                ].map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      sounds.playClick();
+                      setActiveCategoryFilter(cat.id as ReagentCategory);
+                    }}
+                    className={`px-2.5 py-1 rounded-md border uppercase whitespace-nowrap transition-all ${
+                      activeCategoryFilter === cat.id
+                        ? "bg-emerald-950 border-emerald-400 text-emerald-300 font-bold"
+                        : "bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700"
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Scrollable grid of chemicals */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[380px] sm:max-h-[460px] overflow-y-auto custom-scrollbar pr-1">
+                {filteredReagents.map((reagent) => {
+                  const isPresent = activeReagents.includes(reagent.id);
+                  return (
+                    <button
+                      key={reagent.id}
+                      onClick={() => handleAddReagent(reagent)}
+                      className={`p-2 rounded-lg border text-left transition-all duration-150 flex flex-col justify-between h-[76px] sm:h-[82px] relative overflow-hidden group ${
+                        isPresent
+                          ? "border-emerald-400 bg-emerald-950/40 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+                          : `border-slate-800 bg-gradient-to-br ${reagent.bgGradient} hover:border-slate-600`
+                      }`}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <span className="text-[9px] text-slate-400 uppercase">{reagent.category}</span>
+                        <div
+                          className="w-2.5 h-2.5 rounded-full border border-white/30"
+                          style={{ backgroundColor: reagent.color }}
+                        />
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-white truncate group-hover:text-emerald-300">
+                          {reagent.name}
+                        </div>
+                        <div className="text-[10px] text-emerald-400 truncate">{reagent.formula}</div>
+                      </div>
+                      <div className="absolute right-1 bottom-1 opacity-0 group-hover:opacity-100 transition-opacity text-[9px] text-emerald-400">
+                        +{doseAmount}mL
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* ═════════════════════════════════════════════════════════════
-          MODE 2: FLAME SPECTROSCOPY LAB (UNREAL CHEMIST SIGNATURE)
+          MODE 2: FLAME SPECTROSCOPY (3D BUNSEN & WIRE APPARATUS)
       ═════════════════════════════════════════════════════════════ */}
       {activeMode === "flame_test" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -1168,7 +1220,7 @@ export default function VirtualAlchemyLab() {
                 <Flame className="w-4 h-4 text-amber-400" />
                 <span>SELECT SALT EMISSION SAMPLE</span>
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 max-h-[360px] overflow-y-auto custom-scrollbar pr-1">
                 {FLAME_ELEMENTS.map((elem) => (
                   <button
                     key={elem.id}
@@ -1196,11 +1248,11 @@ export default function VirtualAlchemyLab() {
             </div>
           </div>
 
-          {/* Bunsen Burner Flame Stage (8 cols) */}
+          {/* 3D Bunsen Burner Flame Stage (8 cols) */}
           <div className="lg:col-span-8 flex flex-col gap-4">
             <div className="solo-window p-6 rounded-xl border border-slate-800 bg-[#0A0D14]/95 flex flex-col items-center justify-center relative min-h-[380px] overflow-hidden">
               {/* Cobalt Glass Toggle */}
-              <div className="absolute top-4 right-4 z-20">
+              <div className="absolute top-4 right-4 z-30">
                 <button
                   onClick={() => {
                     sounds.playClick();
@@ -1226,24 +1278,24 @@ export default function VirtualAlchemyLab() {
                 </div>
               )}
 
-              {/* Platinum Wire Loop Thrusting Mechanism */}
-              <div className="relative flex flex-col items-center z-15">
+              {/* Platinum Wire Loop Thrusting Mechanism into 3D Flame */}
+              <div className="relative flex flex-col items-center z-20">
                 {/* Platinum Wire Loop with sample */}
                 <div
-                  className={`w-1 h-36 bg-gradient-to-b from-slate-400 to-slate-200 rounded transition-transform duration-500 ease-out flex flex-col items-center justify-end ${
+                  className={`w-1 h-32 bg-gradient-to-b from-slate-400 via-slate-200 to-slate-400 rounded transition-transform duration-500 ease-out flex flex-col items-center justify-end z-25 shadow-md ${
                     isWireInFlame ? "translate-y-8" : "-translate-y-6"
                   }`}
                 >
                   <div
-                    className="w-4 h-4 rounded-full border-2 border-slate-300"
+                    className="w-4 h-4 rounded-full border-2 border-slate-300 shadow-sm"
                     style={{
                       backgroundColor: isWireInFlame ? selectedFlameElement.flameColorHex : "#cbd5e1",
                     }}
                   />
                 </div>
 
-                {/* REALISTIC ROARING RED FLAME STAGE */}
-                <div className="my-2">
+                {/* 3D Realistic Roaring Flame */}
+                <div className="my-1">
                   <RealisticFlame
                     size="lg"
                     intensity={3}
@@ -1258,13 +1310,12 @@ export default function VirtualAlchemyLab() {
                   />
                 </div>
 
-                {/* Bunsen Burner Metal Base */}
-                <div className="w-8 h-16 bg-slate-700 border border-slate-600 rounded-t" />
-                <div className="w-24 h-4 bg-slate-900 border border-slate-700 rounded-full" />
+                {/* 3D Metallic Bunsen Burner Base */}
+                <BunsenBurner3D heatLevel={3} size="md" />
               </div>
 
-              {/* Test Action Button */}
-              <div className="mt-6 z-20">
+              {/* Action Button */}
+              <div className="mt-5 z-30">
                 <button
                   onClick={() => {
                     sounds.playFlame();
@@ -1300,7 +1351,7 @@ export default function VirtualAlchemyLab() {
       )}
 
       {/* ═════════════════════════════════════════════════════════════
-          MODE 3: BURETTE & TITRATION SIMULATOR
+          MODE 3: 3D BURETTE & TITRATION SIMULATOR
       ═════════════════════════════════════════════════════════════ */}
       {activeMode === "titration" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -1397,16 +1448,24 @@ export default function VirtualAlchemyLab() {
             </div>
           </div>
 
-          {/* Burette & Erlenmeyer Visual Stage (7 cols) */}
+          {/* 3D Burette & Erlenmeyer Visual Stage (7 cols) */}
           <div className="lg:col-span-7 solo-window p-6 rounded-xl border border-slate-800 bg-[#0A0D14]/95 flex flex-col items-center justify-center relative min-h-[420px]">
-            {/* Graduated Burette Tube */}
-            <div className="relative w-8 h-56 border-2 border-slate-500 rounded-b bg-slate-900/60 overflow-hidden flex flex-col justify-end">
+            {/* 3D Graduated Precision Glass Burette Tube */}
+            <div className="relative w-8 h-56 glass-3d-cylinder rounded-b flex flex-col justify-end overflow-hidden shadow-2xl">
+              {/* Specular White Line Highlight */}
+              <div className="absolute left-1.5 top-0 bottom-0 w-1 bg-white/40 pointer-events-none z-20" />
+
+              {/* Liquid inside burette */}
               <div
-                className="w-full bg-cyan-400/50 transition-all duration-300"
+                className="w-full bg-cyan-400/50 transition-all duration-300 relative"
                 style={{ height: `${(buretteVolume / 50.0) * 100}%` }}
-              />
-              {/* Graduations */}
-              <div className="absolute inset-0 flex flex-col justify-between py-2 text-[8px] text-slate-400 font-mono pointer-events-none px-0.5">
+              >
+                {/* 3D Concave Liquid Meniscus */}
+                <div className="absolute -top-1 left-0 right-0 h-2 rounded-full bg-cyan-200/60 border-t border-white/60" />
+              </div>
+
+              {/* Calibrations in crisp white */}
+              <div className="absolute inset-0 flex flex-col justify-between py-2 text-[8px] text-white/70 font-mono pointer-events-none px-1 font-bold">
                 <span>- 0</span>
                 <span>- 10</span>
                 <span>- 20</span>
@@ -1416,35 +1475,52 @@ export default function VirtualAlchemyLab() {
               </div>
             </div>
 
-            {/* Stopcock valve & dripping nozzle */}
-            <div className="relative flex flex-col items-center my-1">
-              <div className="w-5 h-2 bg-slate-600 rounded" />
-              <div className="w-1.5 h-3 bg-slate-400" />
-              {/* Falling droplet animation */}
+            {/* 3D Glass Stopcock Valve & Nozzle */}
+            <div className="relative flex flex-col items-center my-1 z-10">
+              {/* Valve key handle */}
+              <div className="w-6 h-2.5 rounded bg-gradient-to-r from-red-600 via-red-400 to-red-700 shadow-md border border-red-900" />
+              <div className="w-1.5 h-3 bg-gradient-to-r from-slate-400 to-slate-200" />
+
+              {/* Falling Droplet FX */}
               {isTitratingFlow && (
-                <div className="w-2 h-2 rounded-full bg-cyan-300 animate-drop shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+                <div className="w-2.5 h-2.5 rounded-full bg-cyan-300 animate-drop shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
               )}
             </div>
 
-            {/* Conical Erlenmeyer Flask */}
-            <div className="relative w-36 h-32 border-b-4 border-l-4 border-r-4 border-slate-500 rounded-b-3xl bg-slate-950/60 backdrop-blur-sm overflow-hidden flex flex-col justify-end">
+            {/* 3D Conical Erlenmeyer Glass Flask */}
+            <div className="relative w-40 h-36 glass-3d-cylinder rounded-b-3xl overflow-hidden flex flex-col justify-end shadow-2xl">
+              {/* Dual glass reflections */}
+              <div className="absolute left-2 top-0 bottom-0 w-2 bg-gradient-to-r from-white/30 to-transparent pointer-events-none z-20" />
+              <div className="absolute right-2 top-0 bottom-0 w-1.5 bg-gradient-to-l from-white/20 to-transparent pointer-events-none z-20" />
+
+              {/* 3D Solution with Dynamic Color Transition */}
               <div
-                className="w-full transition-all duration-500 ease-out"
+                className="w-full relative transition-all duration-500 ease-out flex flex-col justify-start"
                 style={{
                   height: "45%",
                   backgroundColor:
                     titrantIndicator === "phenolphthalein"
                       ? titrationPh >= 8.2
                         ? "#ec4899"
-                        : "rgba(224, 242, 254, 0.4)"
+                        : "rgba(224, 242, 254, 0.45)"
                       : titrationPh < 3.5
                       ? "#ef4444"
                       : "#eab308",
-                  opacity: 0.85,
+                  opacity: 0.9,
                 }}
-              />
+              >
+                {/* 3D Meniscus */}
+                <div className="absolute -top-1.5 left-0 right-0 h-3 rounded-full bg-white/30 border-t border-white/50" />
+
+                {/* Spinning Stir Bar at Base */}
+                <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2">
+                  <div className="w-7 h-2 rounded-full bg-white border border-slate-300 shadow animate-stirbar-3d" />
+                </div>
+              </div>
             </div>
-            <div className="w-40 h-2 bg-slate-800 rounded-full mt-1" />
+
+            {/* Magnetic Stirrer Base Platform */}
+            <div className="w-44 h-3 bg-gradient-to-r from-slate-800 via-slate-600 to-slate-900 rounded-full mt-1 border-t border-slate-500 shadow-md" />
           </div>
         </div>
       )}
@@ -1454,7 +1530,6 @@ export default function VirtualAlchemyLab() {
       ═════════════════════════════════════════════════════════════ */}
       {activeMode === "salt_detective" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 font-mono">
-          {/* Diagnostic Tests Panel (5 cols) */}
           <div className="lg:col-span-5 flex flex-col gap-3">
             <div className="solo-window p-4 rounded-xl border border-slate-800 bg-[#0A0D14]/90 flex flex-col gap-2.5 text-xs">
               <div className="text-white font-bold uppercase tracking-wider flex items-center gap-2">
@@ -1466,41 +1541,32 @@ export default function VirtualAlchemyLab() {
               </p>
 
               <div className="flex flex-col gap-2 pt-2">
-                <button
-                  onClick={() => runDetectiveTest("flame")}
-                  className="p-2 rounded bg-slate-900 border border-slate-700 text-slate-300 hover:border-purple-400 text-left flex items-center justify-between"
-                >
-                  <span>1. Platinum Wire Flame Test</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-purple-400" />
-                </button>
-                <button
-                  onClick={() => runDetectiveTest("dil_acid")}
-                  className="p-2 rounded bg-slate-900 border border-slate-700 text-slate-300 hover:border-purple-400 text-left flex items-center justify-between"
-                >
-                  <span>2. Dilute H₂SO₄ Anion Group Test</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-purple-400" />
-                </button>
-                <button
-                  onClick={() => runDetectiveTest("conc_acid")}
-                  className="p-2 rounded bg-slate-900 border border-slate-700 text-slate-300 hover:border-purple-400 text-left flex items-center justify-between"
-                >
-                  <span>3. Conc. H₂SO₄ + Copper Turnings Test</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-purple-400" />
-                </button>
-                <button
-                  onClick={() => runDetectiveTest("ki_confirm")}
-                  className="p-2 rounded bg-slate-900 border border-slate-700 text-slate-300 hover:border-purple-400 text-left flex items-center justify-between"
-                >
-                  <span>4. Potassium Iodide (KI) Confirmatory</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-purple-400" />
-                </button>
-                <button
-                  onClick={() => runDetectiveTest("brown_ring")}
-                  className="p-2 rounded bg-slate-900 border border-slate-700 text-slate-300 hover:border-purple-400 text-left flex items-center justify-between"
-                >
-                  <span>5. Ring Test for Nitrate (FeSO₄ + H₂SO₄)</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-purple-400" />
-                </button>
+                {[
+                  { id: "flame", label: "1. Platinum Wire Flame Test" },
+                  { id: "dil_acid", label: "2. Dilute H₂SO₄ Anion Group Test" },
+                  { id: "conc_acid", label: "3. Conc. H₂SO₄ + Copper Turnings Test" },
+                  { id: "ki_confirm", label: "4. Potassium Iodide (KI) Confirmatory" },
+                  { id: "brown_ring", label: "5. Ring Test for Nitrate (FeSO₄ + H₂SO₄)" },
+                ].map((test) => (
+                  <button
+                    key={test.id}
+                    onClick={() => {
+                      sounds.playClick();
+                      let note = "";
+                      if (test.id === "flame") note = "Flame Test: Produced a pale livid-blue/greyish flame on platinum wire.";
+                      else if (test.id === "dil_acid") note = "Dilute H₂SO₄: No brisk effervescence observed (Carbonate, Sulfite absent).";
+                      else if (test.id === "conc_acid") note = "Conc. H₂SO₄: Brown fumes of NO₂ evolved upon heating with copper turnings (Nitrate suspected!).";
+                      else if (test.id === "ki_confirm") note = "KI Solution Added: Brilliant golden yellow precipitate of PbI₂ formed instantly (Lead Pb²⁺ confirmed!).";
+                      else if (test.id === "brown_ring") note = "Brown Ring Test: Distinct brown ring formed at junction of FeSO₄ and conc. H₂SO₄ (Nitrate NO₃⁻ confirmed!).";
+
+                      if (!detectiveNotes.includes(note)) setDetectiveNotes((prev) => [...prev, note]);
+                    }}
+                    className="p-2 rounded bg-slate-900 border border-slate-700 text-slate-300 hover:border-purple-400 text-left flex items-center justify-between transition-all"
+                  >
+                    <span>{test.label}</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-purple-400" />
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -1531,7 +1597,6 @@ export default function VirtualAlchemyLab() {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                {/* Cation Dropdown */}
                 <div>
                   <label className="text-[10px] text-slate-400 block mb-1">IDENTIFIED CATION (BASIC RADICAL):</label>
                   <select
@@ -1548,7 +1613,6 @@ export default function VirtualAlchemyLab() {
                   </select>
                 </div>
 
-                {/* Anion Dropdown */}
                 <div>
                   <label className="text-[10px] text-slate-400 block mb-1">IDENTIFIED ANION (ACID RADICAL):</label>
                   <select
@@ -1579,7 +1643,15 @@ export default function VirtualAlchemyLab() {
             </div>
 
             <button
-              onClick={handleDetectiveSubmit}
+              onClick={() => {
+                if (selectedCationGuess === "Lead (Pb²⁺)" && selectedAnionGuess === "Nitrate (NO₃⁻)") {
+                  sounds.playLevelUp();
+                  setDetectiveResult("CORRECT! You identified Lead(II) Nitrate Pb(NO₃)₂. +500 Hunter Chemistry XP Awarded!");
+                } else {
+                  sounds.playAlert();
+                  setDetectiveResult("INCORRECT ANALYSIS. Re-examine the confirmatory tests and qualitative flow chart.");
+                }
+              }}
               className="mt-6 w-full py-3 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(147,51,234,0.4)] hover:brightness-110 transition-all"
             >
               SUBMIT SYSTEM IDENTIFICATION
@@ -1589,11 +1661,10 @@ export default function VirtualAlchemyLab() {
       )}
 
       {/* ═════════════════════════════════════════════════════════════
-          MODE 5: PERIODIC ELEMENT MATRIX (INSPECTOR)
+          MODE 5: PERIODIC ELEMENT MATRIX
       ═════════════════════════════════════════════════════════════ */}
       {activeMode === "periodic_matrix" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 font-mono">
-          {/* Grid of Elements (7 cols) */}
           <div className="lg:col-span-7 solo-window p-4 rounded-xl border border-slate-800 bg-[#0A0D14]/90">
             <div className="text-white font-bold text-xs uppercase mb-3 flex items-center gap-2">
               <Atom className="w-4 h-4 text-rose-400" />
@@ -1624,7 +1695,6 @@ export default function VirtualAlchemyLab() {
             </div>
           </div>
 
-          {/* Inspected Element Details Card (5 cols) */}
           <div className="lg:col-span-5 solo-window p-6 rounded-xl border border-rose-500/30 bg-rose-950/10 flex flex-col justify-between text-xs">
             <div>
               <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
@@ -1668,7 +1738,7 @@ export default function VirtualAlchemyLab() {
         </div>
       )}
 
-      {/* ── SYSTEM REACTION LOGS TELEMETRY (Persistent at bottom) ── */}
+      {/* ── SYSTEM REACTION LOGS TELEMETRY ── */}
       <div className="mt-8 solo-window p-4 rounded-xl border border-slate-800 bg-[#0A0D14]/95 font-mono">
         <div className="flex items-center justify-between mb-2 text-xs border-b border-slate-800 pb-2">
           <span className="flex items-center gap-2 text-emerald-400 font-bold uppercase tracking-wider">

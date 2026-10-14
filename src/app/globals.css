@@ -617,3 +617,120 @@ body {
   animation: sparkPop 0.4s ease-out forwards;
 }
 
+/* ═══ 3D REALISTIC GLASSWARE & METALLIC APPARATUS ═══ */
+
+/* 3D Glass Beaker & Flask Body with Specular Sheen */
+.glass-3d-cylinder {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.05) 15%,
+    rgba(15, 23, 42, 0.25) 45%,
+    rgba(255, 255, 255, 0.02) 65%,
+    rgba(255, 255, 255, 0.22) 92%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  box-shadow: 
+    inset 2px 0 6px rgba(255, 255, 255, 0.35),
+    inset -2px 0 6px rgba(255, 255, 255, 0.25),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.6),
+    0 12px 28px -4px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(0, 255, 221, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(4px);
+}
+
+/* 3D Glass Rim Beading */
+.glass-3d-rim {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 255, 255, 0.2) 30%,
+    rgba(148, 163, 184, 0.4) 60%,
+    rgba(255, 255, 255, 0.8) 90%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+  box-shadow: 
+    0 2px 5px rgba(0, 0, 0, 0.5),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+/* 3D Liquid Surface Meniscus */
+.liquid-3d-meniscus {
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+}
+
+/* 3D Metallic Bunsen Burner Chrome Chimney Barrel */
+.burner-3d-barrel {
+  background: linear-gradient(
+    90deg,
+    #0f172a 0%,
+    #334155 12%,
+    #64748b 28%,
+    #f8fafc 48%,
+    #94a3b8 62%,
+    #334155 85%,
+    #0f172a 100%
+  );
+  box-shadow: 
+    inset 1px 0 2px rgba(255, 255, 255, 0.6),
+    inset -1px 0 2px rgba(0, 0, 0, 0.8),
+    0 8px 16px rgba(0, 0, 0, 0.7);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  border-right: 1px solid rgba(0, 0, 0, 0.6);
+}
+
+/* 3D Cast Iron Heavy Base */
+.burner-3d-base {
+  background: radial-gradient(
+    ellipse at top,
+    #475569 0%,
+    #1e293b 55%,
+    #090d16 100%
+  );
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.9),
+    0 10px 25px rgba(0, 0, 0, 0.9);
+  border-top: 1.5px solid rgba(148, 163, 184, 0.4);
+  border-bottom: 2px solid #020617;
+}
+
+/* 3D Brass Air Collar */
+.burner-3d-brass-collar {
+  background: linear-gradient(
+    90deg,
+    #78350f 0%,
+    #b45309 15%,
+    #fde68a 45%,
+    #d97706 70%,
+    #78350f 100%
+  );
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* 3D Magnetic Stir Bar */
+@keyframes stirBarSpin3D {
+  0% {
+    transform: rotate(0deg) scaleY(0.7);
+  }
+  50% {
+    transform: rotate(180deg) scaleY(0.7);
+  }
+  100% {
+    transform: rotate(360deg) scaleY(0.7);
+  }
+}
+
+.animate-stirbar-3d {
+  animation: stirBarSpin3D 0.15s linear infinite;
+}
+
